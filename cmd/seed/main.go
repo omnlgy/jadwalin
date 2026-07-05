@@ -6,6 +6,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/omnlgy/jadwalin/internal/config"
 	"github.com/omnlgy/jadwalin/internal/db"
+	"github.com/omnlgy/jadwalin/internal/domain"
 	"github.com/omnlgy/jadwalin/internal/models"
 )
 
@@ -40,21 +41,27 @@ func main() {
 	users := []models.User{
 		{
 			PhoneNumber: "6281234567890",
+			Email:       "john@example.com",
 			Address:     "Jl. Sudirman No. 1",
 			FullName:    "John Doe",
 			Photo:       "http://example.com/john.jpg",
+			Role:        string(domain.RoleAdmin),
 		},
 		{
 			PhoneNumber: "6281122334455",
+			Email:       "jane@example.com",
 			Address:     "Jl. Thamrin No. 2",
 			FullName:    "Jane Smith",
 			Photo:       "http://example.com/jane.jpg",
+			Role:        string(domain.RoleEmployee),
 		},
 		{
 			PhoneNumber: "6287654321098",
+			Email:       "peter@example.com",
 			Address:     "Jl. Gatot Subroto No. 3",
 			FullName:    "Peter Jones",
 			Photo:       "http://example.com/peter.jpg",
+			Role:        string(domain.RoleUser),
 		},
 	}
 

@@ -15,6 +15,11 @@ func NewUserService(userRepo domain.UserRepository) *UserService {
 	}
 }
 
+func (s *UserService) RegisterEmployee(user *domain.User) (*domain.User, error) {
+	user.Role = domain.RoleEmployee
+	return s.userRepo.Create(user)
+}
+
 func (s *UserService) GetByID(id uuid.UUID) (*domain.User, error) {
 	return s.userRepo.GetByID(id)
 }
