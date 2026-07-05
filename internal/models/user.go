@@ -15,6 +15,7 @@ type User struct {
 	FullName    string
 	Photo       string
 	Role        string
+	Verified    bool `gorm:"default:false"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt `gorm:"index"`

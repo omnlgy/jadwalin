@@ -20,6 +20,10 @@ func (s *UserService) RegisterEmployee(user *domain.User) (*domain.User, error) 
 	return s.userRepo.Create(user)
 }
 
+func (s *UserService) VerifyUser(id uuid.UUID) (*domain.User, error) {
+	// return s.userRepo.Verify(id)
+}
+
 func (s *UserService) GetByID(id uuid.UUID) (*domain.User, error) {
 	return s.userRepo.GetByID(id)
 }

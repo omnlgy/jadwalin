@@ -18,6 +18,7 @@ type User struct {
 	FullName    string
 	Photo       string
 	Role        Role
+	Verified    bool
 }
 
 type UserRepository interface {
