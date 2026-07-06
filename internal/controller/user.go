@@ -67,7 +67,7 @@ func (c *User) VerifyUser(ctx *gin.Context) {
 	key := "register-otp:" + body.Phone
 	err := c.authService.VerifyOTP(ctx.Request.Context(), key, body.OTP)
 	if err != nil {
-		if err == domain.ErrInvalidOTP {
+		if err == domain.ErrInvalidOTP || err == domain.ErrNotFound {
 			ctx.AbortWithStatusJSON(400, dto.InternalErrorResponse{
 				Code:    400,
 				Message: "Invalid OTP",

@@ -30,9 +30,11 @@ func (s *AuthService) GenerateOTP(ctx context.Context, key string) error {
 
 func (s *AuthService) VerifyOTP(ctx context.Context, key, code string) error {
 	exists, err := s.authRepo.Get(ctx, key)
+
 	if err != nil {
 		return err
 	}
+
 	if exists != code {
 		return domain.ErrInvalidOTP
 	}

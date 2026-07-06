@@ -2,8 +2,10 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"time"
 
+	"github.com/omnlgy/jadwalin/internal/domain"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -23,7 +25,11 @@ func (a *Auth) Create(ctx context.Context, key string, value string, duration ti
 }
 
 func (a *Auth) Get(ctx context.Context, key string) (string, error) {
-	return a.client.Get(ctx, key).Result()
+	result, err := a.client.Get(ctx, key).Result()
+	if errors.Is(err, redis.Nil) {
+		return "", domain.ErrNotFound
+	}
+	return result, err
 }
 
 func (a *Auth) Delete(ctx context.Context, key string) error {
