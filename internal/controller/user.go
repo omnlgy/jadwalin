@@ -8,15 +8,17 @@ import (
 
 type User struct {
 	userService domain.UserService
+	authService domain.AuthService
 }
 
-func NewUser(userService domain.UserService) *User {
+func NewUserController(userService domain.UserService, authService domain.AuthService) *User {
 	return &User{
 		userService: userService,
+		authService: authService,
 	}
 }
 
-func (u *User) RegisterEmployee(ctx *gin.Context) {
+func (c *User) RegisterEmployee(ctx *gin.Context) {
 	var body dto.RegisterEmployeeRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		abortWithBadRequest(ctx, err)
@@ -29,7 +31,7 @@ func (u *User) RegisterEmployee(ctx *gin.Context) {
 		FullName:    body.FullName,
 		Photo:       body.Photo,
 	}
-	user, err := u.userService.RegisterEmployee(newUser)
+	user, err := c.userService.RegisterEmployee(newUser)
 	if err != nil {
 		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
 			Code:    500,
@@ -53,4 +55,37 @@ func (u *User) RegisterEmployee(ctx *gin.Context) {
 		Message: "User created successfully",
 		Data:    dataUser,
 	})
+}
+
+func (c *User) VerifyUser(ctx *gin.Context) {
+	var body dto.VerifyUserRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		abortWithBadRequest(ctx, err)
+		return
+	}
+
+	key := "register-otp:" + body.Phone
+	err := c.authService.VerifyOTP(ctx.Request.Context(), key, body.OTP)
+	if err != nil {
+		if err == domain.ErrInvalidOTP {
+			ctx.AbortWithStatusJSON(400, dto.InternalErrorResponse{
+				Code:    400,
+				Message: "Invalid OTP",
+			})
+
+		} else {
+			ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
+				Code:    500,
+				Message: err.Error(),
+			})
+		}
+
+		return
+	}
+
+	ctx.JSON(200, dto.SuccessResponse{
+		Code:    200,
+		Message: "User verified successfully",
+	})
+
 }

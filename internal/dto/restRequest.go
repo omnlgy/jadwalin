@@ -7,3 +7,13 @@ type RegisterEmployeeRequest struct {
 	FullName    string `json:"full_name" binding:"required"`
 	Photo       string `json:"photo"`
 }
+
+type VerifyUserRequest struct {
+	Phone string `json:"phone" binding:"required"`
+	OTP   string `json:"otp" binding:"required"`
+}
+
+type RegisterOTPRequest struct {
+	Phone  string `json:"phone" binding:"required"`
+	UserID string `json:"user_id" binding:"required"`
+}

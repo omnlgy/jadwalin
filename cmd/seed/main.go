@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/gofrs/uuid/v5"
+	"github.com/google/uuid"
 	"github.com/omnlgy/jadwalin/internal/config"
 	"github.com/omnlgy/jadwalin/internal/db"
 	"github.com/omnlgy/jadwalin/internal/domain"
@@ -46,6 +46,7 @@ func main() {
 			FullName:    "John Doe",
 			Photo:       "http://example.com/john.jpg",
 			Role:        string(domain.RoleAdmin),
+			Verified:    true,
 		},
 		{
 			PhoneNumber: "6281122334455",
@@ -54,6 +55,7 @@ func main() {
 			FullName:    "Jane Smith",
 			Photo:       "http://example.com/jane.jpg",
 			Role:        string(domain.RoleEmployee),
+			Verified:    true,
 		},
 		{
 			PhoneNumber: "6287654321098",
@@ -62,6 +64,7 @@ func main() {
 			FullName:    "Peter Jones",
 			Photo:       "http://example.com/peter.jpg",
 			Role:        string(domain.RoleUser),
+			Verified:    true,
 		},
 	}
 

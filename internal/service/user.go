@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/gofrs/uuid/v5"
+	"github.com/google/uuid"
 	"github.com/omnlgy/jadwalin/internal/domain"
 )
 
@@ -18,10 +18,6 @@ func NewUserService(userRepo domain.UserRepository) *UserService {
 func (s *UserService) RegisterEmployee(user *domain.User) (*domain.User, error) {
 	user.Role = domain.RoleEmployee
 	return s.userRepo.Create(user)
-}
-
-func (s *UserService) VerifyUser(id uuid.UUID) (*domain.User, error) {
-	// return s.userRepo.Verify(id)
 }
 
 func (s *UserService) GetByID(id uuid.UUID) (*domain.User, error) {

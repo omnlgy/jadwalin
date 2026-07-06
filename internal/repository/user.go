@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/gofrs/uuid/v5"
+	"github.com/google/uuid"
 	"github.com/omnlgy/jadwalin/internal/domain"
 	"github.com/omnlgy/jadwalin/internal/models"
 	"gorm.io/gorm"

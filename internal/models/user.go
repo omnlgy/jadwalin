@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/gofrs/uuid/v5"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
