@@ -16,7 +16,7 @@
         "version": "1.0"
     },
     "host": "localhost:8080",
-    "basePath": "/api/v1",
+    "basePath": "/",
     "paths": {
         "/api/auth/login": {
             "post": {
@@ -158,6 +158,11 @@
         },
         "/api/user/list": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Returns a paginated list of users, with optional search and role filter.",
                 "consumes": [
                     "application/json"
@@ -221,6 +226,11 @@
         },
         "/api/user/register-employee": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Registers a new employee with the provided details.",
                 "consumes": [
                     "application/json"
@@ -313,6 +323,11 @@
         },
         "/api/user/{id}": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Updates an existing user's profile (phone, email, address, full name, photo). All fields are optional.",
                 "consumes": [
                     "application/json"
@@ -370,6 +385,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Deletes a user by ID (soft delete).",
                 "tags": [
                     "User"

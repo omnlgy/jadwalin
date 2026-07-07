@@ -164,6 +164,11 @@ const docTemplate = `{
         },
         "/api/user/list": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Returns a paginated list of users, with optional search and role filter.",
                 "consumes": [
                     "application/json"
@@ -227,6 +232,11 @@ const docTemplate = `{
         },
         "/api/user/register-employee": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Registers a new employee with the provided details.",
                 "consumes": [
                     "application/json"
@@ -319,6 +329,11 @@ const docTemplate = `{
         },
         "/api/user/{id}": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Updates an existing user's profile (phone, email, address, full name, photo). All fields are optional.",
                 "consumes": [
                     "application/json"
@@ -376,6 +391,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Deletes a user by ID (soft delete).",
                 "tags": [
                     "User"
@@ -686,7 +706,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
-	BasePath:         "/api/v1",
+	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Jadwalin API",
 	Description:      "This is a sample server for a scheduling application.",

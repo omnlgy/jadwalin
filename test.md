@@ -576,3 +576,40 @@ DELETE /api/user/00000000-0000-0000-0000-000000000000
 {"code":404,"message":"user not found"}
 ```
 Result: ✅
+
+---
+
+## Auth Middleware Tests
+
+Test run: 2026-07-07
+App running at `http://localhost:8080`
+
+Auth applied to:
+- `GET /api/user/list` → `AuthMiddleware()` only
+- `POST /api/user/register-employee` → `AuthMiddleware()` + `RequireRole("admin")`
+- `PUT /api/user/:id` → `AuthMiddleware()` only
+- `DELETE /api/user/:id` → `AuthMiddleware()` + `RequireRole("admin")`
+
+Admin JWT from `6281234567890` (John, role=admin). Employee JWT from `6281122334455` (Jane, role=employee).
+
+### Positive Cases
+
+| # | Endpoint | Auth | Expected | Result |
+|---|----------|------|----------|--------|
+| 1 | `GET /api/user/list?role=` | admin JWT | 200 | ✅ |
+| 2 | `DELETE /api/user/:id` | admin JWT | 404 (no-such-user) | ✅ |
+| 3 | `POST /api/user/register-employee` | admin JWT | 201 | ✅ |
+| 4 | `PUT /api/user/:id` | employee JWT | 404 (no-such-user) | ✅ |
+
+### Negative Cases
+
+| # | Endpoint | Auth | Expected | Result |
+|---|----------|------|----------|--------|
+| 5 | `GET /api/user/list` | none | 401 | ✅ |
+| 6 | `DELETE /api/user/:id` | none | 401 | ✅ |
+| 7 | `POST /api/user/register-employee` | none | 401 | ✅ |
+| 8 | `PUT /api/user/:id` | none | 401 | ✅ |
+| 9 | `DELETE /api/user/:id` | employee JWT | 403 (wrong role) | ✅ |
+| 10 | `POST /api/user/register-employee` | employee JWT | 403 (wrong role) | ✅ |
+
+**Result: 10/10 passed.**

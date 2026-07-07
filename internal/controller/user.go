@@ -29,6 +29,7 @@ func NewUserController(userService domain.UserService, authService domain.AuthSe
 // @Tags User
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param request body dto.RegisterEmployeeRequest true "Register Employee Request"
 // @Success 201 {object} dto.CreatedResponse
 // @Failure 400 {object} dto.BadRequestResponse
@@ -130,6 +131,7 @@ func (c *User) VerifyUser(ctx *gin.Context) {
 // @Tags User
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param page query int false "Page number (default 1)" minimum(1)
 // @Param limit query int false "Items per page (default 10, max 100)" minimum(1) maximum(100)
 // @Param search query string false "Search keyword (matches name, phone, email)"
@@ -198,6 +200,7 @@ func (c *User) ListUsers(ctx *gin.Context) {
 // @Tags User
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path string true "User ID"
 // @Param request body dto.UpdateUserRequest true "Update User Request"
 // @Success 200 {object} dto.SuccessResponse
@@ -278,6 +281,7 @@ func (c *User) UpdateUser(ctx *gin.Context) {
 // @Summary Delete a user
 // @Description Deletes a user by ID (soft delete).
 // @Tags User
+// @Security ApiKeyAuth
 // @Param id path string true "User ID"
 // @Success 200 {object} dto.SuccessResponse
 // @Failure 400 {object} dto.BadRequestResponse

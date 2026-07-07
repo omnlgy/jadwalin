@@ -1,4 +1,4 @@
-basePath: /api/v1
+basePath: /
 definitions:
   dto.BadRequestResponse:
     properties:
@@ -309,6 +309,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.InternalErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Delete a user
       tags:
       - User
@@ -348,6 +350,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.InternalErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Update a user
       tags:
       - User
@@ -392,6 +396,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.InternalErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: List users with pagination
       tags:
       - User
@@ -422,6 +428,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.InternalErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Register a new employee
       tags:
       - User

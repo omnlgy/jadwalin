@@ -61,3 +61,13 @@ type PaginatedResponse struct {
 	Data    any    `json:"data"`
 	Meta    Meta   `json:"meta"`
 }
+
+type UnauthorizedResponse struct {
+	Code    int    `json:"code" example:"401"`
+	Message string `json:"message" example:"unauthorized"`
+}
+
+type ForbiddenResponse struct {
+	Code    int    `json:"code" example:"403"`
+	Message string `json:"message" example:"forbidden"`
+}
