@@ -124,13 +124,14 @@ func (c *User) VerifyUser(ctx *gin.Context) {
 
 // ListUsers godoc
 // @Summary List users with pagination
-// @Description Returns a paginated list of users, with optional search filter by name, phone, or email.
+// @Description Returns a paginated list of users, with optional search and role filter.
 // @Tags User
 // @Accept json
 // @Produce json
 // @Param page query int false "Page number (default 1)" minimum(1)
 // @Param limit query int false "Items per page (default 10, max 100)" minimum(1) maximum(100)
 // @Param search query string false "Search keyword (matches name, phone, email)"
+// @Param role query string false "Role filter (default user)" Enums(admin, employee, user)
 // @Success 200 {object} dto.PaginatedResponse
 // @Failure 500 {object} dto.InternalErrorResponse
 // @Router /api/user/list [get]
@@ -138,6 +139,7 @@ func (c *User) ListUsers(ctx *gin.Context) {
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
 	search := ctx.Query("search")
+	role := domain.Role(ctx.DefaultQuery("role", "user"))
 
 	if page < 1 {
 		page = 1
@@ -151,7 +153,7 @@ func (c *User) ListUsers(ctx *gin.Context) {
 
 	offset := (page - 1) * limit
 
-	users, total, err := c.userService.ListUsers(offset, limit, search)
+	users, total, err := c.userService.ListUsers(offset, limit, search, role)
 	if err != nil {
 		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
 			Code:    500,

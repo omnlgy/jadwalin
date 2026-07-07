@@ -269,8 +269,8 @@ paths:
     get:
       consumes:
       - application/json
-      description: Returns a paginated list of users, with optional search filter
-        by name, phone, or email.
+      description: Returns a paginated list of users, with optional search and role
+        filter.
       parameters:
       - description: Page number (default 1)
         in: query
@@ -286,6 +286,14 @@ paths:
       - description: Search keyword (matches name, phone, email)
         in: query
         name: search
+        type: string
+      - description: Role filter (default user)
+        enum:
+        - admin
+        - employee
+        - user
+        in: query
+        name: role
         type: string
       produces:
       - application/json

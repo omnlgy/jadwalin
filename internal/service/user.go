@@ -28,6 +28,6 @@ func (s *UserService) GetByPhoneNumber(phone string) (*domain.User, error) {
 	return s.userRepo.GetByPhoneNumber(phone)
 }
 
-func (s *UserService) ListUsers(offset, limit int, search string) ([]domain.User, int64, error) {
-	return s.userRepo.List(offset, limit, search)
+func (s *UserService) ListUsers(offset, limit int, search string, role domain.Role) ([]domain.User, int64, error) {
+	return s.userRepo.List(offset, limit, search, role)
 }

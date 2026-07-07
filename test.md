@@ -355,3 +355,123 @@ Content-Type: application/json
 {"code":400,"message":"invalid otp","errors":null}
 ```
 Result: ✅ — no Redis error leak.
+
+---
+
+## List Users with Pagination
+
+Test run: 2026-07-07
+App running at `http://localhost:8080`
+
+### Positive Cases
+
+#### 1. List Users — Default (no params, filters to role=user)
+```http
+GET /api/user/list
+```
+**Response:** `200 OK`
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "id": "019f3ca2-4f1c-7516-824f-358c5dd79f2b",
+      "phone_number": "6287654321098",
+      "email": "peter@example.com",
+      "full_name": "Peter Jones",
+      "role": "user",
+      "verified": true
+    }
+  ],
+  "meta": {"page": 1, "limit": 10, "total": 1, "total_pages": 1}
+}
+```
+
+#### 2. List Users — Filter by admin role
+```http
+GET /api/user/list?role=admin
+```
+**Response:** `200 OK`
+```json
+{
+  "data": [
+    {
+      "id": "019f3ca2-4f0e-7366-a96a-80efead92282",
+      "phone_number": "6281234567890",
+      "email": "john@example.com",
+      "full_name": "John Doe",
+      "role": "admin",
+      "verified": true
+    }
+  ],
+  "meta": {"page": 1, "limit": 10, "total": 1, "total_pages": 1}
+}
+```
+
+#### 3. List Users — Filter by employee role
+```http
+GET /api/user/list?role=employee
+```
+**Response:** `200 OK`
+```json
+{
+  "data": [
+    {
+      "id": "019f3ca2-4f15-736c-9877-50bf60ad49b5",
+      "phone_number": "6281122334455",
+      "email": "jane@example.com",
+      "full_name": "Jane Smith",
+      "role": "employee",
+      "verified": true
+    }
+  ],
+  "meta": {"page": 1, "limit": 10, "total": 1, "total_pages": 1}
+}
+```
+
+#### 4. List Users — Empty role (returns all roles)
+```http
+GET /api/user/list?role=
+```
+**Response:** `200 OK` — returns all 3 seeded users (admin, employee, user).
+
+#### 5. List Users — Pagination (page 1, limit 2)
+```http
+GET /api/user/list?page=1&limit=2&role=
+```
+**Response:** `200 OK` — 2 items, `"total": 3`, `"total_pages": 2`.
+
+#### 6. List Users — Pagination (page 2, limit 2)
+```http
+GET /api/user/list?page=2&limit=2&role=
+```
+**Response:** `200 OK` — 1 item (John Doe).
+
+#### 7. List Users — Search by name
+```http
+GET /api/user/list?search=john&role=
+```
+**Response:** `200 OK` — 1 item (John Doe).
+
+#### 8. List Users — No matches
+```http
+GET /api/user/list?search=zzz_nonexistent&role=
+```
+**Response:** `200 OK`
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": [],
+  "meta": {"page": 1, "limit": 10, "total": 0, "total_pages": 0}
+}
+```
+
+### Negative Cases
+
+#### 9. List Users — Invalid page=0 (clamped to 1)
+```http
+GET /api/user/list?page=0
+```
+**Response:** `200 OK` — same as default (page 1).

@@ -25,7 +25,7 @@ type UserRepository interface {
 	Create(user *User) (*User, error)
 	GetByID(id uuid.UUID) (*User, error)
 	GetByPhoneNumber(phoneNumber string) (*User, error)
-	List(offset, limit int, search string) ([]User, int64, error)
+	List(offset, limit int, search string, role Role) ([]User, int64, error)
 	Update(user *User) error
 	Delete(id uuid.UUID) error
 }
@@ -34,5 +34,5 @@ type UserService interface {
 	GetByID(id uuid.UUID) (*User, error)
 	RegisterEmployee(user *User) (*User, error)
 	GetByPhoneNumber(phoneNumber string) (*User, error)
-	ListUsers(offset, limit int, search string) ([]User, int64, error)
+	ListUsers(offset, limit int, search string, role Role) ([]User, int64, error)
 }

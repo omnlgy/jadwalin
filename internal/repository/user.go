@@ -92,9 +92,13 @@ func (r *User) Delete(id uuid.UUID) error {
 	return nil
 }
 
-func (r *User) List(offset, limit int, search string) ([]domain.User, int64, error) {
+func (r *User) List(offset, limit int, search string, role domain.Role) ([]domain.User, int64, error) {
 	var total int64
 	query := r.db.Model(&models.User{})
+
+	if role != "" {
+		query = query.Where("role = ?", role)
+	}
 
 	if search != "" {
 		like := "%" + search + "%"

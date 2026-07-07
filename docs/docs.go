@@ -164,7 +164,7 @@ const docTemplate = `{
         },
         "/api/user/list": {
             "get": {
-                "description": "Returns a paginated list of users, with optional search filter by name, phone, or email.",
+                "description": "Returns a paginated list of users, with optional search and role filter.",
                 "consumes": [
                     "application/json"
                 ],
@@ -195,6 +195,17 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Search keyword (matches name, phone, email)",
                         "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "admin",
+                            "employee",
+                            "user"
+                        ],
+                        "type": "string",
+                        "description": "Role filter (default user)",
+                        "name": "role",
                         "in": "query"
                     }
                 ],
