@@ -42,6 +42,41 @@ definitions:
         example: Internal server error
         type: string
     type: object
+  dto.LoginRequest:
+    properties:
+      phone:
+        example: +628****7890
+        type: string
+    required:
+    - phone
+    type: object
+  dto.Meta:
+    properties:
+      limit:
+        example: 10
+        type: integer
+      page:
+        example: 1
+        type: integer
+      total:
+        example: 50
+        type: integer
+      total_pages:
+        example: 5
+        type: integer
+    type: object
+  dto.PaginatedResponse:
+    properties:
+      code:
+        example: 200
+        type: integer
+      data: {}
+      message:
+        example: success
+        type: string
+      meta:
+        $ref: '#/definitions/dto.Meta'
+    type: object
   dto.RegisterEmployeeRequest:
     properties:
       address:
@@ -68,7 +103,7 @@ definitions:
   dto.RegisterOTPRequest:
     properties:
       phone:
-        example: "+6281234567890"
+        example: +628****7890
         type: string
       user_id:
         example: a1b2c3d4-e5f6-7890-1234-567890abcdef
@@ -82,6 +117,7 @@ definitions:
       code:
         example: 200
         type: integer
+      data: {}
       message:
         example: OTP sent successfully
         type: string
@@ -139,6 +175,66 @@ info:
   title: Jadwalin API
   version: "1.0"
 paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Sends an OTP to the registered phone number for login.
+      parameters:
+      - description: Login Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: Login — request OTP
+      tags:
+      - Auth
+  /api/auth/login-verify:
+    post:
+      consumes:
+      - application/json
+      description: Verifies the OTP for login and returns a JWT token.
+      parameters:
+      - description: Verify OTP Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.VerifyUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: Login — verify OTP
+      tags:
+      - Auth
   /api/auth/register-otp:
     post:
       consumes:
@@ -169,6 +265,42 @@ paths:
       summary: Register OTP for a user
       tags:
       - Auth
+  /api/user/list:
+    get:
+      consumes:
+      - application/json
+      description: Returns a paginated list of users, with optional search filter
+        by name, phone, or email.
+      parameters:
+      - description: Page number (default 1)
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: Items per page (default 10, max 100)
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - description: Search keyword (matches name, phone, email)
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PaginatedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: List users with pagination
+      tags:
+      - User
   /api/user/register-employee:
     post:
       consumes:

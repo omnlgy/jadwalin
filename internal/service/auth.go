@@ -41,6 +41,11 @@ func (s *AuthService) VerifyOTP(ctx context.Context, key, code string) error {
 	return nil
 }
 
+func (s *AuthService) Login(ctx context.Context, phone string) (string, error) {
+	// TODO: implement login logic
+	return "", nil
+}
+
 func generateCode() string {
 	return fmt.Sprintf("%06d", rand.IntN(1000000))
 }

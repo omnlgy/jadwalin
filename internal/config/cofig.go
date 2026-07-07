@@ -6,6 +6,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
+var AppConfig *Config
+
 type Config struct {
 	APP_PORT    string
 	DB_HOST     string
@@ -20,6 +22,7 @@ type Config struct {
 	SMTP_USER   string
 	SMTP_PASS   string
 	SMTP_SENDER string
+	JWT_SECRET  string
 }
 
 func Load() *Config {
@@ -31,7 +34,7 @@ func Load() *Config {
 	envFile := ".env." + env
 
 	_ = godotenv.Load(envFile)
-	return &Config{
+	AppConfig = &Config{
 		APP_PORT:    getEnv("APP_PORT", "8080"),
 		DB_HOST:     getEnv("POSTGRES_HOST", "localhost"),
 		DB_PORT:     getEnv("POSTGRES_PORT", "5432"),
@@ -45,7 +48,9 @@ func Load() *Config {
 		SMTP_USER:   getEnv("SMTP_USER", ""),
 		SMTP_PASS:   getEnv("SMTP_PASSWORD", ""),
 		SMTP_SENDER: getEnv("SMTP_SENDER", ""),
+		JWT_SECRET:  getEnv("JWT_SECRET", "your-secret-key"),
 	}
+	return AppConfig
 }
 
 func getEnv(key string, defaultVal string) string {

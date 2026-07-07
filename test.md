@@ -240,3 +240,118 @@ Result: ✅ Fixed — no longer leaks Redis error.
 ### ~~Bug 2: Verify User with non-existent phone leaks Redis error~~ **FIXED**
 
 Now returns `400 Invalid OTP` instead of `500 redis: nil`.
+
+---
+
+## Login Endpoint Tests
+
+Test run: 2026-07-07
+App running at `http://localhost:8080`
+
+### Positive Cases
+
+#### 1. Login — Request OTP (Success)
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{"phone":"6281234567890"}
+```
+**Response:** `200 OK`
+```json
+{"code":200,"message":"otp sent","data":null}
+```
+OTP stored in Redis with key `login-otp:{phone}` for 5 minutes.
+
+#### 2. Login — Verify OTP (Success)
+```http
+POST /api/auth/login-verify
+Content-Type: application/json
+
+{"phone":"6281234567890","otp":"<from redis>"}
+```
+**Response:** `200 OK`
+```json
+{
+  "code":200,
+  "message":"otp verified",
+  "data":{"token":"eyJhbG...NiIs..."}
+}
+```
+Returns a JWT token with claims:
+```json
+{
+  "UserID": "019f3ca2-4f0e-7366-a96a-80efead92282",
+  "Role": "admin",
+  "PhoneNumber": "6281234567890",
+  "exp": 1783457535,
+  "iat": 1783428735
+}
+```
+
+### Negative Cases
+
+#### 3. Login — Missing phone field
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{}
+```
+**Response:** `400 Bad Request`
+```json
+{"code":400,"message":"Validation failed","errors":[{"field":"phone","message":"required"}]}
+```
+Result: ✅
+
+#### 4. Login — User not found (non-existent phone)
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{"phone":"6289999999999"}
+```
+**Response:** `400 Bad Request`
+```json
+{"code":400,"message":"user not found","errors":null}
+```
+Result: ✅
+
+#### 5. Login Verify — Missing fields
+```http
+POST /api/auth/login-verify
+Content-Type: application/json
+
+{}
+```
+**Response:** `400 Bad Request`
+```json
+{"code":400,"message":"Validation failed","errors":[{"field":"phone","message":"required"},{"field":"otp","message":"required"}]}
+```
+Result: ✅
+
+#### 6. Login Verify — Wrong OTP
+```http
+POST /api/auth/login-verify
+Content-Type: application/json
+
+{"phone":"6281234567890","otp":"000000"}
+```
+**Response:** `400 Bad Request`
+```json
+{"code":400,"message":"invalid otp","errors":null}
+```
+Result: ✅
+
+#### 7. Login Verify — Non-existent phone (no OTP in Redis)
+```http
+POST /api/auth/login-verify
+Content-Type: application/json
+
+{"phone":"6289999999999","otp":"123456"}
+```
+**Response:** `400 Bad Request`
+```json
+{"code":400,"message":"invalid otp","errors":null}
+```
+Result: ✅ — no Redis error leak.

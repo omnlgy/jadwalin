@@ -23,3 +23,11 @@ func (s *UserService) RegisterEmployee(user *domain.User) (*domain.User, error) 
 func (s *UserService) GetByID(id uuid.UUID) (*domain.User, error) {
 	return s.userRepo.GetByID(id)
 }
+
+func (s *UserService) GetByPhoneNumber(phone string) (*domain.User, error) {
+	return s.userRepo.GetByPhoneNumber(phone)
+}
+
+func (s *UserService) ListUsers(offset, limit int, search string) ([]domain.User, int64, error) {
+	return s.userRepo.List(offset, limit, search)
+}

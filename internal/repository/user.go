@@ -28,6 +28,9 @@ func (r *User) Create(user *domain.User) (*domain.User, error) {
 		Role:        string(user.Role),
 	}
 	if err := r.db.Create(m).Error; err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return nil, fmt.Errorf("repo: create user: %w", domain.ErrConflict)
+		}
 		return nil, fmt.Errorf("repo: create user: %w", err)
 	}
 	user.ID = m.ID
@@ -89,6 +92,35 @@ func (r *User) Delete(id uuid.UUID) error {
 	return nil
 }
 
+func (r *User) List(offset, limit int, search string) ([]domain.User, int64, error) {
+	var total int64
+	query := r.db.Model(&models.User{})
+
+	if search != "" {
+		like := "%" + search + "%"
+		query = query.Where("full_name ILIKE ? OR phone_number ILIKE ? OR email ILIKE ?", like, like, like)
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("repo: count users: %w", err)
+	}
+
+	if total == 0 {
+		return []domain.User{}, 0, nil
+	}
+
+	var ms []models.User
+	if err := query.Order("created_at DESC").Offset(offset).Limit(limit).Find(&ms).Error; err != nil {
+		return nil, 0, fmt.Errorf("repo: list users: %w", err)
+	}
+
+	users := make([]domain.User, len(ms))
+	for i, m := range ms {
+		users[i] = *toDomain(&m)
+	}
+	return users, total, nil
+}
+
 func toDomain(m *models.User) *domain.User {
 	return &domain.User{
 		ID:          m.ID,
@@ -98,5 +130,6 @@ func toDomain(m *models.User) *domain.User {
 		FullName:    m.FullName,
 		Photo:       m.Photo,
 		Role:        domain.Role(m.Role),
+		Verified:    m.Verified,
 	}
 }

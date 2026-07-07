@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"math"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/omnlgy/jadwalin/internal/domain"
 	"github.com/omnlgy/jadwalin/internal/dto"
@@ -44,6 +47,13 @@ func (c *User) RegisterEmployee(ctx *gin.Context) {
 	}
 	user, err := c.userService.RegisterEmployee(newUser)
 	if err != nil {
+		if err == domain.ErrConflict {
+			ctx.AbortWithStatusJSON(409, dto.BadRequestResponse{
+				Code:    409,
+				Message: "User already exists",
+			})
+			return
+		}
 		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
 			Code:    500,
 			Message: err.Error(),
@@ -110,4 +120,70 @@ func (c *User) VerifyUser(ctx *gin.Context) {
 		Message: "User verified successfully",
 	})
 
+}
+
+// ListUsers godoc
+// @Summary List users with pagination
+// @Description Returns a paginated list of users, with optional search filter by name, phone, or email.
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param page query int false "Page number (default 1)" minimum(1)
+// @Param limit query int false "Items per page (default 10, max 100)" minimum(1) maximum(100)
+// @Param search query string false "Search keyword (matches name, phone, email)"
+// @Success 200 {object} dto.PaginatedResponse
+// @Failure 500 {object} dto.InternalErrorResponse
+// @Router /api/user/list [get]
+func (c *User) ListUsers(ctx *gin.Context) {
+	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
+	search := ctx.Query("search")
+
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+	if limit > 100 {
+		limit = 100
+	}
+
+	offset := (page - 1) * limit
+
+	users, total, err := c.userService.ListUsers(offset, limit, search)
+	if err != nil {
+		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
+			Code:    500,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	data := make([]dto.User, len(users))
+	for i, u := range users {
+		data[i] = dto.User{
+			Id:          u.ID.String(),
+			PhoneNumber: u.PhoneNumber,
+			Email:       u.Email,
+			FullName:    u.FullName,
+			Photo:       u.Photo,
+			Role:        string(u.Role),
+			Verified:    u.Verified,
+		}
+	}
+
+	totalPages := int(math.Ceil(float64(total) / float64(limit)))
+
+	ctx.JSON(200, dto.PaginatedResponse{
+		Code:    200,
+		Message: "success",
+		Data:    data,
+		Meta: dto.Meta{
+			Page:       page,
+			Limit:      limit,
+			Total:      total,
+			TotalPages: totalPages,
+		},
+	})
 }

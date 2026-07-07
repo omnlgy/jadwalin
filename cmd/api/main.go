@@ -12,6 +12,7 @@ import (
 	"github.com/omnlgy/jadwalin/internal/config"
 	"github.com/omnlgy/jadwalin/internal/controller"
 	"github.com/omnlgy/jadwalin/internal/db"
+	"github.com/omnlgy/jadwalin/internal/models"
 	"github.com/omnlgy/jadwalin/internal/repository"
 	"github.com/omnlgy/jadwalin/internal/router"
 	"github.com/omnlgy/jadwalin/internal/service"
@@ -52,6 +53,12 @@ func main() {
 		return
 	} else {
 		defer sqlDb.Close()
+	}
+
+	// Auto-migrate tables on startup
+	if err := posgreDb.AutoMigrate(&models.User{}); err != nil {
+		fmt.Println("Failed to auto-migrate database:", err)
+		return
 	}
 
 	rDb := db.NewRedisClient(cfg)

@@ -45,4 +45,19 @@ type InternalErrorResponse struct {
 type SuccessResponse struct {
 	Code    int    `json:"code" example:"200"`
 	Message string `json:"message" example:"OTP sent successfully"`
+	Data    any    `json:"data,omitempty"`
+}
+
+type Meta struct {
+	Page       int   `json:"page" example:"1"`
+	Limit      int   `json:"limit" example:"10"`
+	Total      int64 `json:"total" example:"50"`
+	TotalPages int   `json:"total_pages" example:"5"`
+}
+
+type PaginatedResponse struct {
+	Code    int    `json:"code" example:"200"`
+	Message string `json:"message" example:"success"`
+	Data    any    `json:"data"`
+	Meta    Meta   `json:"meta"`
 }

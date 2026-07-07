@@ -14,6 +14,10 @@ type VerifyUserRequest struct {
 }
 
 type RegisterOTPRequest struct {
-	Phone  string `json:"phone" binding:"required" example:"+6281234567890"`
+	Phone  string `json:"phone" binding:"required" example:"+628****7890"`
 	UserID string `json:"user_id" binding:"required" example:"a1b2c3d4-e5f6-7890-1234-567890abcdef"`
+}
+
+type LoginRequest struct {
+	Phone string `json:"phone" binding:"required,e164" example:"+628****7890"`
 }
