@@ -525,3 +525,54 @@ Content-Type: application/json
 {"code":404,"message":"user not found"}
 ```
 Result: ✅
+
+---
+
+## Delete User
+
+Test run: 2026-07-07
+App running at `http://localhost:8080`
+
+### Positive Cases
+
+#### 1. Delete User — Soft delete existing user
+```http
+DELETE /api/user/019f3ca2-4f1c-7516-824f-358c5dd79f2b
+```
+**Response:** `200 OK`
+```json
+{"code":200,"message":"user deleted"}
+```
+Verified via `GET /api/user/list?role=` — user no longer in results (was 3, now 2).
+
+### Negative Cases
+
+#### 2. Delete User — Already deleted user
+```http
+DELETE /api/user/019f3ca2-4f1c-7516-824f-358c5dd79f2b
+```
+**Response:** `404 Not Found`
+```json
+{"code":404,"message":"user not found"}
+```
+Result: ✅
+
+#### 3. Delete User — Invalid UUID
+```http
+DELETE /api/user/bad-id
+```
+**Response:** `400 Bad Request`
+```json
+{"code":400,"message":"invalid user id"}
+```
+Result: ✅
+
+#### 4. Delete User — Non-existent UUID
+```http
+DELETE /api/user/00000000-0000-0000-0000-000000000000
+```
+**Response:** `404 Not Found`
+```json
+{"code":404,"message":"user not found"}
+```
+Result: ✅

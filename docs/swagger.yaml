@@ -284,6 +284,34 @@ paths:
       tags:
       - Auth
   /api/user/{id}:
+    delete:
+      description: Deletes a user by ID (soft delete).
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: Delete a user
+      tags:
+      - User
     put:
       consumes:
       - application/json

@@ -35,3 +35,7 @@ func (s *UserService) ListUsers(offset, limit int, search string, role domain.Ro
 func (s *UserService) UpdateUser(user *domain.User) error {
 	return s.userRepo.Update(user)
 }
+
+func (s *UserService) DeleteUser(id uuid.UUID) error {
+	return s.userRepo.Delete(id)
+}

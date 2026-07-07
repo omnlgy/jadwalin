@@ -273,3 +273,44 @@ func (c *User) UpdateUser(ctx *gin.Context) {
 		Message: "user updated",
 	})
 }
+
+// DeleteUser godoc
+// @Summary Delete a user
+// @Description Deletes a user by ID (soft delete).
+// @Tags User
+// @Param id path string true "User ID"
+// @Success 200 {object} dto.SuccessResponse
+// @Failure 400 {object} dto.BadRequestResponse
+// @Failure 404 {object} dto.BadRequestResponse
+// @Failure 500 {object} dto.InternalErrorResponse
+// @Router /api/user/{id} [delete]
+func (c *User) DeleteUser(ctx *gin.Context) {
+	userId, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.AbortWithStatusJSON(400, dto.BadRequestResponse{
+			Code:    400,
+			Message: "invalid user id",
+		})
+		return
+	}
+
+	if err := c.userService.DeleteUser(userId); err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			ctx.AbortWithStatusJSON(404, dto.BadRequestResponse{
+				Code:    404,
+				Message: "user not found",
+			})
+		} else {
+			ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
+				Code:    500,
+				Message: err.Error(),
+			})
+		}
+		return
+	}
+
+	ctx.JSON(200, dto.SuccessResponse{
+		Code:    200,
+		Message: "user deleted",
+	})
+}

@@ -20,4 +20,5 @@ func UserRoutes(router *gin.Engine, controller controller.User) {
 	user.POST("/verify", controller.VerifyUser)
 	user.GET("/list", controller.ListUsers)
 	user.PUT("/:id", controller.UpdateUser)
+	user.DELETE("/:id", controller.DeleteUser)
 }
