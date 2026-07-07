@@ -21,6 +21,17 @@ func NewAuthController(authService domain.AuthService, userService domain.UserSe
 	}
 }
 
+// RegisterOTP godoc
+// @Summary Register OTP for a user
+// @Description Sends an OTP to the user's registered phone number for verification.
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body dto.RegisterOTPRequest true "Register OTP Request"
+// @Success 200 {object} dto.SuccessResponse
+// @Failure 400 {object} dto.BadRequestResponse
+// @Failure 500 {object} dto.InternalErrorResponse
+// @Router /api/auth/register-otp [post]
 func (c *Auth) RegisterOTP(ctx *gin.Context) {
 	var body dto.RegisterOTPRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {

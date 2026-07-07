@@ -4,6 +4,11 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "github.com/omnlgy/jadwalin/docs" // Import generated docs
+
 	"github.com/omnlgy/jadwalin/internal/config"
 	"github.com/omnlgy/jadwalin/internal/controller"
 	"github.com/omnlgy/jadwalin/internal/db"
@@ -11,6 +16,25 @@ import (
 	"github.com/omnlgy/jadwalin/internal/router"
 	"github.com/omnlgy/jadwalin/internal/service"
 )
+
+// @title Jadwalin API
+// @version 1.0
+// @description This is a sample server for a scheduling application.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /api/v1
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 
 func main() {
 	fmt.Println("Initializing server...")
@@ -51,6 +75,9 @@ func main() {
 
 	router.AuthRoutes(server, *authController)
 	router.UserRoutes(server, *userController)
+
+	// Add Swagger UI
+	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	fmt.Println("Starting server on port " + cfg.APP_PORT)
 	if err := server.Run(":" + cfg.APP_PORT); err != nil {

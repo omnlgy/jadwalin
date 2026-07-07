@@ -1,0 +1,238 @@
+basePath: /api/v1
+definitions:
+  dto.BadRequestResponse:
+    properties:
+      code:
+        example: 400
+        type: integer
+      errors:
+        items:
+          $ref: '#/definitions/dto.FieldError'
+        type: array
+      message:
+        example: bad request
+        type: string
+    type: object
+  dto.CreatedResponse:
+    properties:
+      code:
+        example: 201
+        type: integer
+      data:
+        $ref: '#/definitions/dto.User'
+      message:
+        example: User created successfully
+        type: string
+    type: object
+  dto.FieldError:
+    properties:
+      field:
+        example: phone_number
+        type: string
+      message:
+        example: invalid phone number
+        type: string
+    type: object
+  dto.InternalErrorResponse:
+    properties:
+      code:
+        example: 500
+        type: integer
+      message:
+        example: Internal server error
+        type: string
+    type: object
+  dto.RegisterEmployeeRequest:
+    properties:
+      address:
+        example: Jl. Merdeka No. 1
+        type: string
+      email:
+        example: john.doe@example.com
+        type: string
+      full_name:
+        example: John Doe
+        type: string
+      phone_number:
+        example: "+6281234567890"
+        type: string
+      photo:
+        example: http://example.com/photo.jpg
+        type: string
+    required:
+    - address
+    - email
+    - full_name
+    - phone_number
+    type: object
+  dto.RegisterOTPRequest:
+    properties:
+      phone:
+        example: "+6281234567890"
+        type: string
+      user_id:
+        example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        type: string
+    required:
+    - phone
+    - user_id
+    type: object
+  dto.SuccessResponse:
+    properties:
+      code:
+        example: 200
+        type: integer
+      message:
+        example: OTP sent successfully
+        type: string
+    type: object
+  dto.User:
+    properties:
+      address:
+        example: Jl. Merdeka No. 1
+        type: string
+      email:
+        example: john.doe@example.com
+        type: string
+      full_name:
+        example: John Doe
+        type: string
+      id:
+        example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        type: string
+      phone_number:
+        example: +628****7890
+        type: string
+      photo:
+        example: http://example.com/photo.jpg
+        type: string
+      role:
+        example: employee
+        type: string
+      verified:
+        example: true
+        type: boolean
+    type: object
+  dto.VerifyUserRequest:
+    properties:
+      otp:
+        example: "123456"
+        type: string
+      phone:
+        example: "+6281234567890"
+        type: string
+    required:
+    - otp
+    - phone
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server for a scheduling application.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Jadwalin API
+  version: "1.0"
+paths:
+  /api/auth/register-otp:
+    post:
+      consumes:
+      - application/json
+      description: Sends an OTP to the user's registered phone number for verification.
+      parameters:
+      - description: Register OTP Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterOTPRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: Register OTP for a user
+      tags:
+      - Auth
+  /api/user/register-employee:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new employee with the provided details.
+      parameters:
+      - description: Register Employee Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterEmployeeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CreatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: Register a new employee
+      tags:
+      - User
+  /api/user/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verifies a user by checking the provided OTP against the stored
+        one.
+      parameters:
+      - description: Verify User Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.VerifyUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: Verify user with OTP
+      tags:
+      - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

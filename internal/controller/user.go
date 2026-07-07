@@ -18,6 +18,17 @@ func NewUserController(userService domain.UserService, authService domain.AuthSe
 	}
 }
 
+// RegisterEmployee godoc
+// @Summary Register a new employee
+// @Description Registers a new employee with the provided details.
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param request body dto.RegisterEmployeeRequest true "Register Employee Request"
+// @Success 201 {object} dto.CreatedResponse
+// @Failure 400 {object} dto.BadRequestResponse
+// @Failure 500 {object} dto.InternalErrorResponse
+// @Router /api/user/register-employee [post]
 func (c *User) RegisterEmployee(ctx *gin.Context) {
 	var body dto.RegisterEmployeeRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -57,6 +68,17 @@ func (c *User) RegisterEmployee(ctx *gin.Context) {
 	})
 }
 
+// VerifyUser godoc
+// @Summary Verify user with OTP
+// @Description Verifies a user by checking the provided OTP against the stored one.
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param request body dto.VerifyUserRequest true "Verify User Request"
+// @Success 200 {object} dto.SuccessResponse
+// @Failure 400 {object} dto.InternalErrorResponse
+// @Failure 500 {object} dto.InternalErrorResponse
+// @Router /api/user/verify [post]
 func (c *User) VerifyUser(ctx *gin.Context) {
 	var body dto.VerifyUserRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
