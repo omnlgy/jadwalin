@@ -31,3 +31,7 @@ func (s *UserService) GetByPhoneNumber(phone string) (*domain.User, error) {
 func (s *UserService) ListUsers(offset, limit int, search string, role domain.Role) ([]domain.User, int64, error) {
 	return s.userRepo.List(offset, limit, search, role)
 }
+
+func (s *UserService) UpdateUser(user *domain.User) error {
+	return s.userRepo.Update(user)
+}

@@ -475,3 +475,53 @@ GET /api/user/list?search=zzz_nonexistent&role=
 GET /api/user/list?page=0
 ```
 **Response:** `200 OK` — same as default (page 1).
+
+---
+
+## Update User
+
+Test run: 2026-07-07
+App running at `http://localhost:8080`
+
+### Positive Cases
+
+#### 1. Update User — Change full name
+```http
+PUT /api/user/019f3ca2-4f0e-7366-a96a-80efead92282
+Content-Type: application/json
+
+{"full_name":"John Updated"}
+```
+**Response:** `200 OK`
+```json
+{"code":200,"message":"user updated"}
+```
+Verified via `GET /api/user/list?search=updated&role=` — returns the user with the new name.
+
+### Negative Cases
+
+#### 2. Update User — Invalid UUID
+```http
+PUT /api/user/bad-id
+Content-Type: application/json
+
+{"full_name":"x"}
+```
+**Response:** `400 Bad Request`
+```json
+{"code":400,"message":"invalid user id"}
+```
+Result: ✅
+
+#### 3. Update User — Non-existent user
+```http
+PUT /api/user/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{"full_name":"x"}
+```
+**Response:** `404 Not Found`
+```json
+{"code":404,"message":"user not found"}
+```
+Result: ✅

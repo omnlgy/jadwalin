@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"errors"
 	"math"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/omnlgy/jadwalin/internal/domain"
 	"github.com/omnlgy/jadwalin/internal/dto"
 )
@@ -187,5 +189,87 @@ func (c *User) ListUsers(ctx *gin.Context) {
 			Total:      total,
 			TotalPages: totalPages,
 		},
+	})
+}
+
+// UpdateUser godoc
+// @Summary Update a user
+// @Description Updates an existing user's profile (phone, email, address, full name, photo). All fields are optional.
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Param request body dto.UpdateUserRequest true "Update User Request"
+// @Success 200 {object} dto.SuccessResponse
+// @Failure 400 {object} dto.BadRequestResponse
+// @Failure 404 {object} dto.BadRequestResponse
+// @Failure 500 {object} dto.InternalErrorResponse
+// @Router /api/user/{id} [put]
+func (c *User) UpdateUser(ctx *gin.Context) {
+	userId, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.AbortWithStatusJSON(400, dto.BadRequestResponse{
+			Code:    400,
+			Message: "invalid user id",
+		})
+		return
+	}
+
+	currentUser, err := c.userService.GetByID(userId)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			ctx.AbortWithStatusJSON(404, dto.BadRequestResponse{
+				Code:    404,
+				Message: "user not found",
+			})
+		} else {
+			ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
+				Code:    500,
+				Message: err.Error(),
+			})
+		}
+		return
+	}
+
+	var body dto.UpdateUserRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		abortWithBadRequest(ctx, err)
+		return
+	}
+
+	if body.PhoneNumber != "" {
+		currentUser.PhoneNumber = body.PhoneNumber
+	}
+	if body.Email != "" {
+		currentUser.Email = body.Email
+	}
+	if body.Address != "" {
+		currentUser.Address = body.Address
+	}
+	if body.FullName != "" {
+		currentUser.FullName = body.FullName
+	}
+	if body.Photo != "" {
+		currentUser.Photo = body.Photo
+	}
+
+	if err := c.userService.UpdateUser(currentUser); err != nil {
+		if errors.Is(err, domain.ErrConflict) {
+			ctx.AbortWithStatusJSON(409, dto.BadRequestResponse{
+				Code:    409,
+				Message: "phone number or email already in use",
+			})
+		} else {
+			ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
+				Code:    500,
+				Message: err.Error(),
+			})
+		}
+		return
+	}
+
+	ctx.JSON(200, dto.SuccessResponse{
+		Code:    200,
+		Message: "user updated",
 	})
 }

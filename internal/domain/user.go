@@ -35,4 +35,5 @@ type UserService interface {
 	RegisterEmployee(user *User) (*User, error)
 	GetByPhoneNumber(phoneNumber string) (*User, error)
 	ListUsers(offset, limit int, search string, role Role) ([]User, int64, error)
+	UpdateUser(user *User) error
 }

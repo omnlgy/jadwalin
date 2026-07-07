@@ -122,6 +122,24 @@ definitions:
         example: OTP sent successfully
         type: string
     type: object
+  dto.UpdateUserRequest:
+    properties:
+      address:
+        example: Jl. Merdeka No. 1
+        type: string
+      email:
+        example: john.doe@example.com
+        type: string
+      full_name:
+        example: John Doe
+        type: string
+      phone_number:
+        example: +628****7890
+        type: string
+      photo:
+        example: http://example.com/photo.jpg
+        type: string
+    type: object
   dto.User:
     properties:
       address:
@@ -265,6 +283,46 @@ paths:
       summary: Register OTP for a user
       tags:
       - Auth
+  /api/user/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing user's profile (phone, email, address, full
+        name, photo). All fields are optional.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update User Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: Update a user
+      tags:
+      - User
   /api/user/list:
     get:
       consumes:

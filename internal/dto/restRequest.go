@@ -21,3 +21,11 @@ type RegisterOTPRequest struct {
 type LoginRequest struct {
 	Phone string `json:"phone" binding:"required,e164" example:"+628****7890"`
 }
+
+type UpdateUserRequest struct {
+	PhoneNumber string `json:"phone_number" example:"+628****7890"`
+	Email       string `json:"email" example:"john.doe@example.com"`
+	Address     string `json:"address" example:"Jl. Merdeka No. 1"`
+	FullName    string `json:"full_name" example:"John Doe"`
+	Photo       string `json:"photo" example:"http://example.com/photo.jpg"`
+}
