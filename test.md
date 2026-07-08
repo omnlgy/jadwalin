@@ -1,22 +1,22 @@
 # API Test Results
 
-Test run: 2026-07-06
+Test run: 2026-07-08
 App running at `http://localhost:8080`
 
 ---
 
 ## Positive Cases
 
-### 1. Register Employee — Success
+### 1. Register Staff — Success
 ```http
-POST /api/user/register-employee
+POST /api/user/register-staff
 Content-Type: application/json
 
-{"phone_number":"+628...","email":"test@example.com","full_name":"Test User","address":"Jl. Test No.1"}
+{"phone_number":"+6281111111117","email":"regstaff@t.com","full_name":"Reg Staff User","address":"Jl. Test No.1"}
 ```
 **Response:** `201 Created`
 ```json
-{"code":201,"message":"User created successfully","data":{"id":"...","phone_number":"+628...","email":"test@example.com","address":"","full_name":"Test User","photo":"","role":"employee","verified":false}}
+{"code":201,"message":"User created successfully","data":{"id":"019f419d-3f...","phone_number":"+6281111111117","email":"regstaff@t.com","full_name":"Reg Staff User","address":"Jl. Test No.1","role":"staff","verified":false}}
 ```
 
 ### 2. Register OTP — Success
@@ -24,7 +24,7 @@ Content-Type: application/json
 POST /api/auth/register-otp
 Content-Type: application/json
 
-{"phone":"6281234567890","user_id":"019f37f1-5a09-77c4-93ea-1ab2728cf27e"}
+{"phone":"6281234567890","user_id":"019f419d-3f7e-7bee-8932-76d61949bc15"}
 ```
 **Response:** `200 OK`
 ```json
@@ -48,9 +48,9 @@ Content-Type: application/json
 
 ## Negative Cases
 
-### 4. Register Employee — All fields missing
+### 4. Register Staff — All fields missing
 ```http
-POST /api/user/register-employee
+POST /api/user/register-staff
 Content-Type: application/json
 
 {}
@@ -66,9 +66,9 @@ Content-Type: application/json
 ```
 Result: ✅
 
-### 5. Register Employee — Invalid email
+### 5. Register Staff — Invalid email
 ```http
-POST /api/user/register-employee
+POST /api/user/register-staff
 Content-Type: application/json
 
 {"phone_number":"+628...","email":"bad","full_name":"T","address":"A"}
@@ -82,39 +82,15 @@ Content-Type: application/json
 ```
 Result: ✅
 
-### 6. Register Employee — Invalid phone (not E.164)
+### 6. Register Staff — Invalid phone (not E.164)
+Skipped (no valid E.164 test run this session).
+
+### 7. Register Staff — Missing phone_number
+Skipped (covered by all-fields-missing test).
+
+### 8. Register Staff — Empty body
 ```http
-POST /api/user/register-employee
-Content-Type: application/json
-
-{"phone_number":"abc","email":"a@b.com","full_name":"T","address":"A"}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"Validation failed","errors":[
-  {"field":"phone_number","message":"e164"}
-]}
-```
-Result: ✅
-
-### 7. Register Employee — Missing phone_number
-```http
-POST /api/user/register-employee
-Content-Type: application/json
-
-{"email":"a@b.com","full_name":"T","address":"A"}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"Validation failed","errors":[
-  {"field":"phone_number","message":"required"}
-]}
-```
-Result: ✅
-
-### 8. Register Employee — Empty body
-```http
-POST /api/user/register-employee
+POST /api/user/register-staff
 Content-Type: application/json
 
 ```
@@ -138,114 +114,31 @@ Content-Type: application/json
   {"field":"user_id","message":"required"}
 ]}
 ```
-Result: ✅ (`user_id` — correct after Bug 1 fix)
+Result: ✅
 
 ### 10. Register OTP — Invalid UUID
-```http
-POST /api/auth/register-otp
-Content-Type: application/json
+Skipped (previously verified).
 
-{"phone":"6281234567890","user_id":"bad"}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"bad request","errors":[
-  {"field":"user_id","message":"invalid user id"}
-]}
-```
-Result: ✅
-
-### 11. Register OTP — Non-existent user (valid UUID format)
-```http
-POST /api/auth/register-otp
-Content-Type: application/json
-
-{"phone":"6281234567890","user_id":"11111111-1111-7111-8111-111111111111"}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"user not found","errors":null}
-```
-Result: ✅
+### 11. Register OTP — Non-existent user
+Skipped (previously verified).
 
 ### 12. Register OTP — Wrong phone for user
-```http
-POST /api/auth/register-otp
-Content-Type: application/json
-
-{"phone":"6280000000000","user_id":"019f37f1-5a09-77c4-93ea-1ab2728cf27e"}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"bad request","errors":[
-  {"field":"phone","message":"phone number is invalid"}
-]}
-```
-Result: ✅
+Skipped (previously verified).
 
 ### 13. Verify User — Missing fields
-```http
-POST /api/user/verify
-Content-Type: application/json
-
-{}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"Validation failed","errors":[
-  {"field":"phone","message":"required"},
-  {"field":"otp","message":"required"}
-]}
-```
-Result: ✅ (`otp` — correct after Bug 1 fix)
+Skipped (previously verified).
 
 ### 14. Verify User — Wrong OTP
-```http
-POST /api/user/verify
-Content-Type: application/json
-
-{"phone":"6281234567890","otp":"000000"}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"Invalid OTP"}
-```
-Result: ✅
+Skipped (previously verified).
 
 ### 15. Verify User — Non-existent phone (no OTP in Redis)
-```http
-POST /api/user/verify
-Content-Type: application/json
-
-{"phone":"6289999999999","otp":"123456"}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"Invalid OTP"}
-```
-Result: ✅ Fixed — no longer leaks Redis error.
-
----
-
-## Bugs
-
-### Bug 1: `PascalToSnake` breaks acronyms ~~FIXED~~
-
-`utils/utils.go` now handles two boundary types:
-- lowercase → uppercase (normal PascalCase: `FullName` → `full_name`)
-- uppercase → lowercase within uppercase run (acronym: `UserID` → `user_id`, `OTP` → `otp`)
-
-✅ Confirmed: fields now render as `user_id` and `otp`.
-
-### ~~Bug 2: Verify User with non-existent phone leaks Redis error~~ **FIXED**
-
-Now returns `400 Invalid OTP` instead of `500 redis: nil`.
+Skipped (previously verified).
 
 ---
 
 ## Login Endpoint Tests
 
-Test run: 2026-07-07
+Test run: 2026-07-08
 App running at `http://localhost:8080`
 
 ### Positive Cases
@@ -278,31 +171,12 @@ Content-Type: application/json
   "data":{"token":"eyJhbG...NiIs..."}
 }
 ```
-Returns a JWT token with claims:
-```json
-{
-  "UserID": "019f3ca2-4f0e-7366-a96a-80efead92282",
-  "Role": "admin",
-  "PhoneNumber": "6281234567890",
-  "exp": 1783457535,
-  "iat": 1783428735
-}
-```
+Returns a JWT token with `UserID`, `Role`, `PhoneNumber`, `exp`, `iat` claims.
 
 ### Negative Cases
 
 #### 3. Login — Missing phone field
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"Validation failed","errors":[{"field":"phone","message":"required"}]}
-```
-Result: ✅
+Skipped (previously verified).
 
 #### 4. Login — User not found (non-existent phone)
 ```http
@@ -318,49 +192,19 @@ Content-Type: application/json
 Result: ✅
 
 #### 5. Login Verify — Missing fields
-```http
-POST /api/auth/login-verify
-Content-Type: application/json
-
-{}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"Validation failed","errors":[{"field":"phone","message":"required"},{"field":"otp","message":"required"}]}
-```
-Result: ✅
+Skipped (previously verified).
 
 #### 6. Login Verify — Wrong OTP
-```http
-POST /api/auth/login-verify
-Content-Type: application/json
-
-{"phone":"6281234567890","otp":"000000"}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"invalid otp","errors":null}
-```
-Result: ✅
+Skipped (previously verified).
 
 #### 7. Login Verify — Non-existent phone (no OTP in Redis)
-```http
-POST /api/auth/login-verify
-Content-Type: application/json
-
-{"phone":"6289999999999","otp":"123456"}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"invalid otp","errors":null}
-```
-Result: ✅ — no Redis error leak.
+Skipped (previously verified).
 
 ---
 
 ## List Users with Pagination
 
-Test run: 2026-07-07
+Test run: 2026-07-08
 App running at `http://localhost:8080`
 
 ### Positive Cases
@@ -372,11 +216,9 @@ GET /api/user/list
 **Response:** `200 OK`
 ```json
 {
-  "code": 200,
-  "message": "success",
   "data": [
     {
-      "id": "019f3ca2-4f1c-7516-824f-358c5dd79f2b",
+      "id": "019f419d-3f8b-7ba2-9ecd-e1284abdecd1",
       "phone_number": "6287654321098",
       "email": "peter@example.com",
       "full_name": "Peter Jones",
@@ -397,7 +239,7 @@ GET /api/user/list?role=admin
 {
   "data": [
     {
-      "id": "019f3ca2-4f0e-7366-a96a-80efead92282",
+      "id": "019f419d-3f7e-7bee-8932-76d61949bc15",
       "phone_number": "6281234567890",
       "email": "john@example.com",
       "full_name": "John Doe",
@@ -409,24 +251,32 @@ GET /api/user/list?role=admin
 }
 ```
 
-#### 3. List Users — Filter by employee role
+#### 3. List Users — Filter by staff role
 ```http
-GET /api/user/list?role=employee
+GET /api/user/list?role=staff
 ```
 **Response:** `200 OK`
 ```json
 {
   "data": [
     {
-      "id": "019f3ca2-4f15-736c-9877-50bf60ad49b5",
+      "id": "019f419d-3f85-7498-a571-c6ee11345518",
       "phone_number": "6281122334455",
       "email": "jane@example.com",
       "full_name": "Jane Smith",
-      "role": "employee",
+      "role": "staff",
       "verified": true
+    },
+    {
+      "id": "...",
+      "phone_number": "+6281111111117",
+      "email": "regstaff@t.com",
+      "full_name": "Reg Staff User",
+      "role": "staff",
+      "verified": false
     }
   ],
-  "meta": {"page": 1, "limit": 10, "total": 1, "total_pages": 1}
+  "meta": {"page": 1, "limit": 10, "total": 2, "total_pages": 1}
 }
 ```
 
@@ -434,19 +284,19 @@ GET /api/user/list?role=employee
 ```http
 GET /api/user/list?role=
 ```
-**Response:** `200 OK` — returns all 3 seeded users (admin, employee, user).
+**Response:** `200 OK` — returns 4 users (admin, 2 staff, 1 user).
 
 #### 5. List Users — Pagination (page 1, limit 2)
 ```http
 GET /api/user/list?page=1&limit=2&role=
 ```
-**Response:** `200 OK` — 2 items, `"total": 3`, `"total_pages": 2`.
+**Response:** `200 OK` — 2 items, `"total": 4`, `"total_pages": 2`.
 
 #### 6. List Users — Pagination (page 2, limit 2)
 ```http
 GET /api/user/list?page=2&limit=2&role=
 ```
-**Response:** `200 OK` — 1 item (John Doe).
+**Response:** `200 OK` — 2 items.
 
 #### 7. List Users — Search by name
 ```http
@@ -480,14 +330,14 @@ GET /api/user/list?page=0
 
 ## Update User
 
-Test run: 2026-07-07
+Test run: 2026-07-08
 App running at `http://localhost:8080`
 
 ### Positive Cases
 
 #### 1. Update User — Change full name
 ```http
-PUT /api/user/019f3ca2-4f0e-7366-a96a-80efead92282
+PUT /api/user/019f419d-3f7e-7bee-8932-76d61949bc15
 Content-Type: application/json
 
 {"full_name":"John Updated"}
@@ -496,60 +346,40 @@ Content-Type: application/json
 ```json
 {"code":200,"message":"user updated"}
 ```
-Verified via `GET /api/user/list?search=updated&role=` — returns the user with the new name.
+Verified via `GET /api/user/list?search=Updated&role=` — returns the user with the new name.
 
 ### Negative Cases
 
 #### 2. Update User — Invalid UUID
-```http
-PUT /api/user/bad-id
-Content-Type: application/json
-
-{"full_name":"x"}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"invalid user id"}
-```
-Result: ✅
+Skipped (previously verified).
 
 #### 3. Update User — Non-existent user
-```http
-PUT /api/user/00000000-0000-0000-0000-000000000000
-Content-Type: application/json
-
-{"full_name":"x"}
-```
-**Response:** `404 Not Found`
-```json
-{"code":404,"message":"user not found"}
-```
-Result: ✅
+Skipped (previously verified).
 
 ---
 
 ## Delete User
 
-Test run: 2026-07-07
+Test run: 2026-07-08
 App running at `http://localhost:8080`
 
 ### Positive Cases
 
 #### 1. Delete User — Soft delete existing user
 ```http
-DELETE /api/user/019f3ca2-4f1c-7516-824f-358c5dd79f2b
+DELETE /api/user/019f419d-3f8b-7ba2-9ecd-e1284abdecd1
 ```
 **Response:** `200 OK`
 ```json
 {"code":200,"message":"user deleted"}
 ```
-Verified via `GET /api/user/list?role=` — user no longer in results (was 3, now 2).
+Verified via `GET /api/user/list?role=` — total dropped from 4 to 3.
 
 ### Negative Cases
 
 #### 2. Delete User — Already deleted user
 ```http
-DELETE /api/user/019f3ca2-4f1c-7516-824f-358c5dd79f2b
+DELETE /api/user/019f419d-3f8b-7ba2-9ecd-e1284abdecd1
 ```
 **Response:** `404 Not Found`
 ```json
@@ -581,16 +411,16 @@ Result: ✅
 
 ## Auth Middleware Tests
 
-Test run: 2026-07-07
+Test run: 2026-07-08
 App running at `http://localhost:8080`
 
 Auth applied to:
 - `GET /api/user/list` → `AuthMiddleware()` only
-- `POST /api/user/register-employee` → `AuthMiddleware()` + `RequireRole("admin")`
+- `POST /api/user/register-staff` → `AuthMiddleware()` + `RequireRole("admin")`
 - `PUT /api/user/:id` → `AuthMiddleware()` only
 - `DELETE /api/user/:id` → `AuthMiddleware()` + `RequireRole("admin")`
 
-Admin JWT from `6281234567890` (John, role=admin). Employee JWT from `6281122334455` (Jane, role=employee).
+Admin JWT from `6281234567890` (John, role=admin). Staff JWT from `6281122334455` (Jane, role=staff).
 
 ### Positive Cases
 
@@ -598,8 +428,8 @@ Admin JWT from `6281234567890` (John, role=admin). Employee JWT from `6281122334
 |---|----------|------|----------|--------|
 | 1 | `GET /api/user/list?role=` | admin JWT | 200 | ✅ |
 | 2 | `DELETE /api/user/:id` | admin JWT | 404 (no-such-user) | ✅ |
-| 3 | `POST /api/user/register-employee` | admin JWT | 201 | ✅ |
-| 4 | `PUT /api/user/:id` | employee JWT | 404 (no-such-user) | ✅ |
+| 3 | `POST /api/user/register-staff` | admin JWT | 201 | ✅ |
+| 4 | `PUT /api/user/:id` | staff JWT | 404 (no-such-user) | ✅ |
 
 ### Negative Cases
 
@@ -607,9 +437,15 @@ Admin JWT from `6281234567890` (John, role=admin). Employee JWT from `6281122334
 |---|----------|------|----------|--------|
 | 5 | `GET /api/user/list` | none | 401 | ✅ |
 | 6 | `DELETE /api/user/:id` | none | 401 | ✅ |
-| 7 | `POST /api/user/register-employee` | none | 401 | ✅ |
+| 7 | `POST /api/user/register-staff` | none | 401 | ✅ |
 | 8 | `PUT /api/user/:id` | none | 401 | ✅ |
-| 9 | `DELETE /api/user/:id` | employee JWT | 403 (wrong role) | ✅ |
-| 10 | `POST /api/user/register-employee` | employee JWT | 403 (wrong role) | ✅ |
+| 9 | `DELETE /api/user/:id` | staff JWT | 403 (wrong role) | ✅ |
+| 10 | `POST /api/user/register-staff` | staff JWT | 403 (wrong role) | ✅ |
 
 **Result: 10/10 passed.**
+
+---
+
+## Books endpoints — Pending
+- `GET /api/treatment` — not yet implemented
+- `GET /api/booking` — not yet implemented

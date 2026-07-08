@@ -44,7 +44,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.LoginRequest"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.LoginRequest"
                         }
                     }
                 ],
@@ -52,19 +52,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SuccessResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -90,7 +90,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.VerifyUserRequest"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.VerifyUserRequest"
                         }
                     }
                 ],
@@ -98,19 +98,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SuccessResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -136,7 +136,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RegisterOTPRequest"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.RegisterOTPRequest"
                         }
                     }
                 ],
@@ -144,19 +144,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SuccessResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -205,7 +205,7 @@ const docTemplate = `{
                     {
                         "enum": [
                             "admin",
-                            "employee",
+                            "staff",
                             "user"
                         ],
                         "type": "string",
@@ -218,26 +218,26 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.PaginatedResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.PaginatedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/api/user/register-employee": {
+        "/api/user/register-staff": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Registers a new employee with the provided details.",
+                "description": "Registers a new staff with the provided details.",
                 "consumes": [
                     "application/json"
                 ],
@@ -247,15 +247,15 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Register a new employee",
+                "summary": "Register a new staff",
                 "parameters": [
                     {
-                        "description": "Register Employee Request",
+                        "description": "Register User Request",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RegisterEmployeeRequest"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.RegisterUserRequest"
                         }
                     }
                 ],
@@ -263,19 +263,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dto.CreatedResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.CreatedResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -301,7 +301,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.VerifyUserRequest"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.VerifyUserRequest"
                         }
                     }
                 ],
@@ -309,19 +309,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SuccessResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -359,7 +359,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UpdateUserRequest"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.UpdateUserRequest"
                         }
                     }
                 ],
@@ -367,25 +367,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SuccessResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -414,25 +414,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SuccessResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -440,7 +440,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.BadRequestResponse": {
+        "github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -450,7 +450,7 @@ const docTemplate = `{
                 "errors": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dto.FieldError"
+                        "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.FieldError"
                     }
                 },
                 "message": {
@@ -459,7 +459,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.CreatedResponse": {
+        "github_com_omnlgy_jadwalin_internal_dto.CreatedResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -467,7 +467,7 @@ const docTemplate = `{
                     "example": 201
                 },
                 "data": {
-                    "$ref": "#/definitions/dto.User"
+                    "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.User"
                 },
                 "message": {
                     "type": "string",
@@ -475,7 +475,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.FieldError": {
+        "github_com_omnlgy_jadwalin_internal_dto.FieldError": {
             "type": "object",
             "properties": {
                 "field": {
@@ -488,7 +488,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.InternalErrorResponse": {
+        "github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -501,7 +501,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.LoginRequest": {
+        "github_com_omnlgy_jadwalin_internal_dto.LoginRequest": {
             "type": "object",
             "required": [
                 "phone"
@@ -513,7 +513,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.Meta": {
+        "github_com_omnlgy_jadwalin_internal_dto.Meta": {
             "type": "object",
             "properties": {
                 "limit": {
@@ -534,7 +534,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.PaginatedResponse": {
+        "github_com_omnlgy_jadwalin_internal_dto.PaginatedResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -547,11 +547,28 @@ const docTemplate = `{
                     "example": "success"
                 },
                 "meta": {
-                    "$ref": "#/definitions/dto.Meta"
+                    "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.Meta"
                 }
             }
         },
-        "dto.RegisterEmployeeRequest": {
+        "github_com_omnlgy_jadwalin_internal_dto.RegisterOTPRequest": {
+            "type": "object",
+            "required": [
+                "phone",
+                "user_id"
+            ],
+            "properties": {
+                "phone": {
+                    "type": "string",
+                    "example": "+628****7890"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                }
+            }
+        },
+        "github_com_omnlgy_jadwalin_internal_dto.RegisterUserRequest": {
             "type": "object",
             "required": [
                 "address",
@@ -582,24 +599,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.RegisterOTPRequest": {
-            "type": "object",
-            "required": [
-                "phone",
-                "user_id"
-            ],
-            "properties": {
-                "phone": {
-                    "type": "string",
-                    "example": "+628****7890"
-                },
-                "user_id": {
-                    "type": "string",
-                    "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
-                }
-            }
-        },
-        "dto.SuccessResponse": {
+        "github_com_omnlgy_jadwalin_internal_dto.SuccessResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -613,7 +613,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UpdateUserRequest": {
+        "github_com_omnlgy_jadwalin_internal_dto.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "address": {
@@ -638,7 +638,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.User": {
+        "github_com_omnlgy_jadwalin_internal_dto.User": {
             "type": "object",
             "properties": {
                 "address": {
@@ -667,7 +667,7 @@ const docTemplate = `{
                 },
                 "role": {
                     "type": "string",
-                    "example": "employee"
+                    "example": "staff"
                 },
                 "verified": {
                     "type": "boolean",
@@ -675,7 +675,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.VerifyUserRequest": {
+        "github_com_omnlgy_jadwalin_internal_dto.VerifyUserRequest": {
             "type": "object",
             "required": [
                 "otp",

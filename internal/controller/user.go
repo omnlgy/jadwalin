@@ -23,20 +23,20 @@ func NewUserController(userService domain.UserService, authService domain.AuthSe
 	}
 }
 
-// RegisterEmployee godoc
-// @Summary Register a new employee
-// @Description Registers a new employee with the provided details.
+// RegisterStaff godoc
+// @Summary Register a new staff
+// @Description Registers a new staff with the provided details.
 // @Tags User
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param request body dto.RegisterEmployeeRequest true "Register Employee Request"
+// @Param request body dto.RegisterUserRequest true "Register User Request"
 // @Success 201 {object} dto.CreatedResponse
 // @Failure 400 {object} dto.BadRequestResponse
 // @Failure 500 {object} dto.InternalErrorResponse
-// @Router /api/user/register-employee [post]
-func (c *User) RegisterEmployee(ctx *gin.Context) {
-	var body dto.RegisterEmployeeRequest
+// @Router /api/user/register-staff [post]
+func (c *User) RegisterStaff(ctx *gin.Context) {
+	var body dto.RegisterUserRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		abortWithBadRequest(ctx, err)
 		return
@@ -48,9 +48,9 @@ func (c *User) RegisterEmployee(ctx *gin.Context) {
 		FullName:    body.FullName,
 		Photo:       body.Photo,
 	}
-	user, err := c.userService.RegisterEmployee(newUser)
+	user, err := c.userService.RegisterStaff(newUser)
 	if err != nil {
-		if err == domain.ErrConflict {
+		if errors.Is(err, domain.ErrConflict) {
 			ctx.AbortWithStatusJSON(409, dto.BadRequestResponse{
 				Code:    409,
 				Message: "User already exists",
@@ -102,7 +102,7 @@ func (c *User) VerifyUser(ctx *gin.Context) {
 	key := "register-otp:" + body.Phone
 	err := c.authService.VerifyOTP(ctx.Request.Context(), key, body.OTP)
 	if err != nil {
-		if err == domain.ErrInvalidOTP || err == domain.ErrNotFound {
+		if errors.Is(err, domain.ErrInvalidOTP) || errors.Is(err, domain.ErrNotFound) {
 			ctx.AbortWithStatusJSON(400, dto.InternalErrorResponse{
 				Code:    400,
 				Message: "Invalid OTP",
@@ -135,7 +135,7 @@ func (c *User) VerifyUser(ctx *gin.Context) {
 // @Param page query int false "Page number (default 1)" minimum(1)
 // @Param limit query int false "Items per page (default 10, max 100)" minimum(1) maximum(100)
 // @Param search query string false "Search keyword (matches name, phone, email)"
-// @Param role query string false "Role filter (default user)" Enums(admin, employee, user)
+// @Param role query string false "Role filter (default user)" Enums(admin, staff, user)
 // @Success 200 {object} dto.PaginatedResponse
 // @Failure 500 {object} dto.InternalErrorResponse
 // @Router /api/user/list [get]

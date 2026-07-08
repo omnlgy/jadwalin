@@ -56,7 +56,7 @@ func main() {
 	}
 
 	// Auto-migrate tables on startup
-	if err := posgreDb.AutoMigrate(&models.User{}); err != nil {
+	if err := posgreDb.AutoMigrate(&models.User{}, &models.Treatment{}, &models.Booking{}); err != nil {
 		fmt.Println("Failed to auto-migrate database:", err)
 		return
 	}

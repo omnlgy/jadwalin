@@ -15,8 +15,8 @@ func NewUserService(userRepo domain.UserRepository) *UserService {
 	}
 }
 
-func (s *UserService) RegisterEmployee(user *domain.User) (*domain.User, error) {
-	user.Role = domain.RoleEmployee
+func (s *UserService) RegisterStaff(user *domain.User) (*domain.User, error) {
+	user.Role = domain.RoleStaff
 	return s.userRepo.Create(user)
 }
 

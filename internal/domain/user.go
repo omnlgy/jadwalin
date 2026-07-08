@@ -5,9 +5,9 @@ import "github.com/google/uuid"
 type Role string
 
 const (
-	RoleAdmin    Role = "admin"
-	RoleEmployee Role = "employee"
-	RoleUser     Role = "user"
+	RoleAdmin Role = "admin"
+	RoleStaff Role = "staff"
+	RoleUser  Role = "user"
 )
 
 type User struct {
@@ -32,7 +32,7 @@ type UserRepository interface {
 
 type UserService interface {
 	GetByID(id uuid.UUID) (*User, error)
-	RegisterEmployee(user *User) (*User, error)
+	RegisterStaff(user *User) (*User, error)
 	GetByPhoneNumber(phoneNumber string) (*User, error)
 	ListUsers(offset, limit int, search string, role Role) ([]User, int64, error)
 	UpdateUser(user *User) error

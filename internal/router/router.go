@@ -17,7 +17,7 @@ func AuthRoutes(router *gin.Engine, controller controller.Auth) {
 func UserRoutes(router *gin.Engine, controller controller.User) {
 	user := router.Group("/api/user")
 
-	user.POST("/register-employee", middleware.AuthMiddleware(), middleware.RequireRole("admin"), controller.RegisterEmployee)
+	user.POST("/register-staff", middleware.AuthMiddleware(), middleware.RequireRole("admin"), controller.RegisterStaff)
 	user.POST("/verify", controller.VerifyUser)
 	user.GET("/list", middleware.AuthMiddleware(), controller.ListUsers)
 	user.PUT("/:id", middleware.AuthMiddleware(), controller.UpdateUser)

@@ -1,6 +1,6 @@
 package dto
 
-type RegisterEmployeeRequest struct {
+type RegisterUserRequest struct {
 	PhoneNumber string `json:"phone_number" binding:"required,e164" example:"+6281234567890"`
 	Email       string `json:"email" binding:"required,email" example:"john.doe@example.com"`
 	Address     string `json:"address" binding:"required" example:"Jl. Merdeka No. 1"`

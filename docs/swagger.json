@@ -38,7 +38,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.LoginRequest"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.LoginRequest"
                         }
                     }
                 ],
@@ -46,19 +46,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SuccessResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -84,7 +84,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.VerifyUserRequest"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.VerifyUserRequest"
                         }
                     }
                 ],
@@ -92,19 +92,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SuccessResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -130,7 +130,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RegisterOTPRequest"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.RegisterOTPRequest"
                         }
                     }
                 ],
@@ -138,19 +138,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SuccessResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -199,7 +199,7 @@
                     {
                         "enum": [
                             "admin",
-                            "employee",
+                            "staff",
                             "user"
                         ],
                         "type": "string",
@@ -212,26 +212,26 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.PaginatedResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.PaginatedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/api/user/register-employee": {
+        "/api/user/register-staff": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Registers a new employee with the provided details.",
+                "description": "Registers a new staff with the provided details.",
                 "consumes": [
                     "application/json"
                 ],
@@ -241,15 +241,15 @@
                 "tags": [
                     "User"
                 ],
-                "summary": "Register a new employee",
+                "summary": "Register a new staff",
                 "parameters": [
                     {
-                        "description": "Register Employee Request",
+                        "description": "Register User Request",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RegisterEmployeeRequest"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.RegisterUserRequest"
                         }
                     }
                 ],
@@ -257,19 +257,19 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dto.CreatedResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.CreatedResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -295,7 +295,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.VerifyUserRequest"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.VerifyUserRequest"
                         }
                     }
                 ],
@@ -303,19 +303,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SuccessResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -353,7 +353,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UpdateUserRequest"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.UpdateUserRequest"
                         }
                     }
                 ],
@@ -361,25 +361,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SuccessResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -408,25 +408,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SuccessResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/dto.BadRequestResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -434,7 +434,7 @@
         }
     },
     "definitions": {
-        "dto.BadRequestResponse": {
+        "github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -444,7 +444,7 @@
                 "errors": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dto.FieldError"
+                        "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.FieldError"
                     }
                 },
                 "message": {
@@ -453,7 +453,7 @@
                 }
             }
         },
-        "dto.CreatedResponse": {
+        "github_com_omnlgy_jadwalin_internal_dto.CreatedResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -461,7 +461,7 @@
                     "example": 201
                 },
                 "data": {
-                    "$ref": "#/definitions/dto.User"
+                    "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.User"
                 },
                 "message": {
                     "type": "string",
@@ -469,7 +469,7 @@
                 }
             }
         },
-        "dto.FieldError": {
+        "github_com_omnlgy_jadwalin_internal_dto.FieldError": {
             "type": "object",
             "properties": {
                 "field": {
@@ -482,7 +482,7 @@
                 }
             }
         },
-        "dto.InternalErrorResponse": {
+        "github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -495,7 +495,7 @@
                 }
             }
         },
-        "dto.LoginRequest": {
+        "github_com_omnlgy_jadwalin_internal_dto.LoginRequest": {
             "type": "object",
             "required": [
                 "phone"
@@ -507,7 +507,7 @@
                 }
             }
         },
-        "dto.Meta": {
+        "github_com_omnlgy_jadwalin_internal_dto.Meta": {
             "type": "object",
             "properties": {
                 "limit": {
@@ -528,7 +528,7 @@
                 }
             }
         },
-        "dto.PaginatedResponse": {
+        "github_com_omnlgy_jadwalin_internal_dto.PaginatedResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -541,11 +541,28 @@
                     "example": "success"
                 },
                 "meta": {
-                    "$ref": "#/definitions/dto.Meta"
+                    "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.Meta"
                 }
             }
         },
-        "dto.RegisterEmployeeRequest": {
+        "github_com_omnlgy_jadwalin_internal_dto.RegisterOTPRequest": {
+            "type": "object",
+            "required": [
+                "phone",
+                "user_id"
+            ],
+            "properties": {
+                "phone": {
+                    "type": "string",
+                    "example": "+628****7890"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                }
+            }
+        },
+        "github_com_omnlgy_jadwalin_internal_dto.RegisterUserRequest": {
             "type": "object",
             "required": [
                 "address",
@@ -576,24 +593,7 @@
                 }
             }
         },
-        "dto.RegisterOTPRequest": {
-            "type": "object",
-            "required": [
-                "phone",
-                "user_id"
-            ],
-            "properties": {
-                "phone": {
-                    "type": "string",
-                    "example": "+628****7890"
-                },
-                "user_id": {
-                    "type": "string",
-                    "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
-                }
-            }
-        },
-        "dto.SuccessResponse": {
+        "github_com_omnlgy_jadwalin_internal_dto.SuccessResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -607,7 +607,7 @@
                 }
             }
         },
-        "dto.UpdateUserRequest": {
+        "github_com_omnlgy_jadwalin_internal_dto.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "address": {
@@ -632,7 +632,7 @@
                 }
             }
         },
-        "dto.User": {
+        "github_com_omnlgy_jadwalin_internal_dto.User": {
             "type": "object",
             "properties": {
                 "address": {
@@ -661,7 +661,7 @@
                 },
                 "role": {
                     "type": "string",
-                    "example": "employee"
+                    "example": "staff"
                 },
                 "verified": {
                     "type": "boolean",
@@ -669,7 +669,7 @@
                 }
             }
         },
-        "dto.VerifyUserRequest": {
+        "github_com_omnlgy_jadwalin_internal_dto.VerifyUserRequest": {
             "type": "object",
             "required": [
                 "otp",

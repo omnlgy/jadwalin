@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/omnlgy/jadwalin/internal/domain"
 	"github.com/omnlgy/jadwalin/internal/models"
 	"gorm.io/gorm"
@@ -28,7 +29,7 @@ func (r *User) Create(user *domain.User) (*domain.User, error) {
 		Role:        string(user.Role),
 	}
 	if err := r.db.Create(m).Error; err != nil {
-		if errors.Is(err, gorm.ErrDuplicatedKey) {
+		if errors.Is(err, gorm.ErrDuplicatedKey) || isPgUniqueViolation(err) {
 			return nil, fmt.Errorf("repo: create user: %w", domain.ErrConflict)
 		}
 		return nil, fmt.Errorf("repo: create user: %w", err)
@@ -123,6 +124,11 @@ func (r *User) List(offset, limit int, search string, role domain.Role) ([]domai
 		users[i] = *toDomain(&m)
 	}
 	return users, total, nil
+}
+
+func isPgUniqueViolation(err error) bool {
+	var pgErr *pgconn.PgError
+	return errors.As(err, &pgErr) && pgErr.Code == "23505"
 }
 
 func toDomain(m *models.User) *domain.User {

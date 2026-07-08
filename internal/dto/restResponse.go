@@ -7,7 +7,7 @@ type User struct {
 	Address     string `json:"address" example:"Jl. Merdeka No. 1"`
 	FullName    string `json:"full_name" example:"John Doe"`
 	Photo       string `json:"photo" example:"http://example.com/photo.jpg"`
-	Role        string `json:"role" example:"employee"`
+	Role        string `json:"role" example:"staff"`
 	Verified    bool   `json:"verified" example:"true"`
 }
 
@@ -22,7 +22,7 @@ type BadRequestResponse struct {
 	Errors  []FieldError `json:"errors"`
 }
 
-type RegisterEmployeeResponse struct {
+type RegisterStaffResponse struct {
 	PhoneNumber string `json:"phone_number"`
 	Email       string `json:"email"`
 	Address     string `json:"address"`
