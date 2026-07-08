@@ -77,9 +77,16 @@ func main() {
 	authService := service.NewAuthService(authRepo)
 	notificationService := service.NewNotificationService(waProvider, nil)
 
+	// Initialize repositories
+	treatmentRepo := repository.NewTreatmentRepository(posgreDb)
+
+	// Initialize services
+	treatmentService := service.NewTreatmentService(treatmentRepo)
+
 	// Initialize controllers
 	authController := controller.NewAuthController(authService, userService, notificationService)
 	userController := controller.NewUserController(userService, authService, notificationService)
+	treatmentController := controller.NewTreatmentController(treatmentService)
 
 	server := gin.New()
 	server.Use(gin.Logger())
@@ -87,6 +94,7 @@ func main() {
 
 	router.AuthRoutes(server, *authController)
 	router.UserRoutes(server, *userController)
+	router.TreatmentRoutes(server, *treatmentController)
 
 	// Add Swagger UI
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

@@ -1,0 +1,24 @@
+meta {
+  name: Update Treatment
+  type: http
+  seq: 12
+}
+
+put {
+  url: {{BASE_URL}}/api/treatment/{{TREATMENT_ID}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Haircut Premium",
+    "description": "Premium haircut with styling",
+    "duration": 45,
+    "price": 80.00
+  }
+}

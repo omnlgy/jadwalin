@@ -446,6 +446,49 @@ Admin JWT from `6281234567890` (John, role=admin). Staff JWT from `6281122334455
 
 ---
 
-## Books endpoints — Pending
-- `GET /api/treatment` — not yet implemented
-- `GET /api/booking` — not yet implemented
+## Treatment CRUD
+
+Test run: 2026-07-08
+App running at `http://localhost:8080`
+
+Auth: admin JWT from `+6289666955155` (John, role=admin).
+
+Access rules:
+- `POST /api/treatment/` → `AuthMiddleware()` + `RequireRole("admin")`
+- `GET /api/treatment/list` → public
+- `GET /api/treatment/:id` → public
+- `PUT /api/treatment/:id` → `AuthMiddleware()` only
+- `DELETE /api/treatment/:id` → `AuthMiddleware()` + `RequireRole("admin")`
+
+### Positive Cases
+
+| # | Endpoint | Expected | Result |
+|---|----------|----------|--------|
+| 1 | `GET /api/treatment/list` | 200 + all treatments | ✅ |
+| 2 | `GET /api/treatment/list?search=mas` | 200 + 1 match (Massage) | ✅ |
+| 3 | `GET /api/treatment/list?page=1&limit=2` | 200 + 2 items, `total_pages:2` | ✅ |
+| 4 | `GET /api/treatment/:id` (valid UUID) | 200 + treatment details | ✅ |
+| 5 | `POST /api/treatment/` (valid body + admin auth) | 201 + created treatment | ✅ |
+| 6 | `PUT /api/treatment/:id` (update name + price) | 200 `"treatment updated"` | ✅ |
+| 7 | `DELETE /api/treatment/:id` (valid UUID + admin auth) | 200 `"treatment deleted"` | ✅ |
+| 8 | `GET /api/treatment/list` (after soft delete) | 200 — deleted treatment hidden | ✅ |
+
+### Negative Cases
+
+| # | Endpoint | Expected | Result |
+|---|----------|----------|--------|
+| 9 | `POST /api/treatment/` — missing required fields (name, duration, price) | 400 validation errors | ✅ |
+| 10 | `POST /api/treatment/` — no auth | 401 | ✅ |
+| 11 | `GET /api/treatment/bad-id` — invalid UUID | 400 `"invalid treatment id"` | ✅ |
+| 12 | `GET /api/treatment/00000000-...` — non-existent | 400 `"treatment not found"` | ✅ |
+| 13 | `PUT /api/treatment/:id` — no auth | 401 | ✅ |
+| 14 | `PUT /api/treatment/00000000-...` — non-existent | 400 `"treatment not found"` | ✅ |
+| 15 | `PUT /api/treatment/bad-id` — invalid UUID | 400 `"invalid treatment id"` | ✅ |
+| 16 | `DELETE /api/treatment/:id` — no auth | 401 | ✅ |
+| 17 | `DELETE /api/treatment/00000000-...` — non-existent | 400 `"treatment not found"` | ✅ |
+| 18 | `DELETE /api/treatment/:id` — already deleted | 400 `"treatment not found"` | ✅ |
+| 19 | `DELETE /api/treatment/bad-id` — invalid UUID | 400 `"invalid treatment id"` | ✅ |
+| 20 | `GET /api/treatment/list?search=nonexistzzz` — no matches | 200 + empty `data` | ✅ |
+| 21 | `GET /api/treatment/list?page=999` — out of range | 200 + empty `data` | ✅ |
+
+**Result: 21/21 passed.**

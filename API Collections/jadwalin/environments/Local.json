@@ -61,6 +61,12 @@
       "value": "",
       "type": "default",
       "secret": false
+    },
+    {
+      "name": "TREATMENT_ID",
+      "value": "",
+      "type": "default",
+      "secret": false
     }
   ]
 }

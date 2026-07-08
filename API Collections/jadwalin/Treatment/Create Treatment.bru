@@ -1,0 +1,24 @@
+meta {
+  name: Create Treatment
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{BASE_URL}}/api/treatment/
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Haircut",
+    "description": "Standard haircut for men and women",
+    "duration": 30,
+    "price": 50.00
+  }
+}

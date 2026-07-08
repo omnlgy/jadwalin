@@ -29,3 +29,17 @@ type UpdateUserRequest struct {
 	FullName    string `json:"full_name" example:"John Doe"`
 	Photo       string `json:"photo" example:"http://example.com/photo.jpg"`
 }
+
+type CreateTreatmentRequest struct {
+	Name        string  `json:"name" binding:"required" example:"Haircut"`
+	Description string  `json:"description" example:"Standard haircut"`
+	Duration    int     `json:"duration" binding:"required,min=1" example:"30"`
+	Price       float64 `json:"price" binding:"required,min=0" example:"50.00"`
+}
+
+type UpdateTreatmentRequest struct {
+	Name        string  `json:"name" example:"Haircut"`
+	Description string  `json:"description" example:"Standard haircut"`
+	Duration    int     `json:"duration" binding:"omitempty,min=1" example:"30"`
+	Price       float64 `json:"price" binding:"omitempty,min=0" example:"50.00"`
+}

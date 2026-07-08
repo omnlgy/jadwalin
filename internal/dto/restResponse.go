@@ -11,6 +11,14 @@ type User struct {
 	Verified    bool   `json:"verified" example:"true"`
 }
 
+type Treatment struct {
+	Id          string  `json:"id" example:"a1b2c3d4-e5f6-7890-1234-567890abcdef"`
+	Name        string  `json:"name" example:"Haircut"`
+	Description string  `json:"description" example:"Standard haircut"`
+	Duration    int     `json:"duration" example:"30"`
+	Price       float64 `json:"price" example:"50.00"`
+}
+
 type FieldError struct {
 	Field   string `json:"field" example:"phone_number"`
 	Message string `json:"message" example:"invalid phone number"`
@@ -34,7 +42,7 @@ type RegisterStaffResponse struct {
 type CreatedResponse struct {
 	Code    int    `json:"code" example:"201"`
 	Message string `json:"message" example:"User created successfully"`
-	Data    User   `json:"data"`
+	Data    any    `json:"data"`
 }
 
 type InternalErrorResponse struct {

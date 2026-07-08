@@ -1,0 +1,17 @@
+meta {
+  name: List Treatments
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{BASE_URL}}/api/treatment/list
+  body: none
+  auth: none
+}
+
+params:query {
+  page: {{page}}
+  limit: {{limit}}
+  search: {{search}}
+}
