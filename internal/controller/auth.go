@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -11,14 +12,16 @@ import (
 )
 
 type Auth struct {
-	authService domain.AuthService
-	userService domain.UserService
+	authService         domain.AuthService
+	userService         domain.UserService
+	notificationService domain.NotificationService
 }
 
-func NewAuthController(authService domain.AuthService, userService domain.UserService) *Auth {
+func NewAuthController(authService domain.AuthService, userService domain.UserService, notificationService domain.NotificationService) *Auth {
 	return &Auth{
-		authService: authService,
-		userService: userService,
+		authService:         authService,
+		userService:         userService,
+		notificationService: notificationService,
 	}
 }
 
@@ -86,7 +89,7 @@ func (c *Auth) RegisterOTP(ctx *gin.Context) {
 	}
 
 	key := "register-otp:" + user.PhoneNumber
-	err = c.authService.GenerateOTP(ctx.Request.Context(), key)
+	otpCode, err := c.authService.GenerateOTP(ctx.Request.Context(), key)
 	if err != nil {
 		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
 			Code:    500,
@@ -94,6 +97,8 @@ func (c *Auth) RegisterOTP(ctx *gin.Context) {
 		})
 		return
 	}
+
+	fmt.Println(otpCode)
 
 	ctx.JSON(200, dto.SuccessResponse{
 		Code:    200,
@@ -136,8 +141,16 @@ func (c *Auth) Login(ctx *gin.Context) {
 	}
 
 	key := "login-otp:" + user.PhoneNumber
-	err = c.authService.GenerateOTP(ctx.Request.Context(), key)
+	otpCode, err := c.authService.GenerateOTP(ctx.Request.Context(), key)
 	if err != nil {
+		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
+			Code:    500,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	if err := c.notificationService.SendOTPLoginWhatsApp(ctx.Request.Context(), user.PhoneNumber, otpCode); err != nil {
 		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
 			Code:    500,
 			Message: err.Error(),

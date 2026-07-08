@@ -12,14 +12,16 @@ import (
 )
 
 type User struct {
-	userService domain.UserService
-	authService domain.AuthService
+	userService         domain.UserService
+	authService         domain.AuthService
+	notificationService domain.NotificationService
 }
 
-func NewUserController(userService domain.UserService, authService domain.AuthService) *User {
+func NewUserController(userService domain.UserService, authService domain.AuthService, notificationService domain.NotificationService) *User {
 	return &User{
-		userService: userService,
-		authService: authService,
+		userService:         userService,
+		authService:         authService,
+		notificationService: notificationService,
 	}
 }
 

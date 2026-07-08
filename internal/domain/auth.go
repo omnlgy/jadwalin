@@ -12,6 +12,6 @@ type AuthRepository interface {
 }
 
 type AuthService interface {
-	GenerateOTP(ctx context.Context, key string) error
+	GenerateOTP(ctx context.Context, key string) (string, error)
 	VerifyOTP(ctx context.Context, key, code string) error
 }

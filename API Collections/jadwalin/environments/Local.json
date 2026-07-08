@@ -1,0 +1,66 @@
+{
+  "version": "1",
+  "name": "Local",
+  "variables": [
+    {
+      "name": "BASE_URL",
+      "value": "http://localhost:8080",
+      "type": "default",
+      "secret": false
+    },
+    {
+      "name": "LOGIN_OTP",
+      "value": "",
+      "type": "default",
+      "secret": false
+    },
+    {
+      "name": "REGISTER_OTP",
+      "value": "",
+      "type": "default",
+      "secret": false
+    },
+    {
+      "name": "JOHN_ID",
+      "value": "",
+      "type": "default",
+      "secret": false
+    },
+    {
+      "name": "USER_ID",
+      "value": "",
+      "type": "default",
+      "secret": false
+    },
+    {
+      "name": "ADMIN_TOKEN",
+      "value": "",
+      "type": "default",
+      "secret": true
+    },
+    {
+      "name": "role",
+      "value": "",
+      "type": "default",
+      "secret": false
+    },
+    {
+      "name": "page",
+      "value": "",
+      "type": "default",
+      "secret": false
+    },
+    {
+      "name": "limit",
+      "value": "",
+      "type": "default",
+      "secret": false
+    },
+    {
+      "name": "search",
+      "value": "",
+      "type": "default",
+      "secret": false
+    }
+  ]
+}

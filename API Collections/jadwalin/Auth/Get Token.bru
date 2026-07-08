@@ -1,0 +1,33 @@
+meta {
+  name: Token
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BASE_URL}}/api/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "phone": "6281234567890"
+  }
+}
+
+script:pre-request {
+  // Login OTP is fetched manually from Redis, then paste into Login Verify
+}
+
+script:post-response {
+  // After Login Verify, extract token into env
+  const data = res.getBody();
+  if (data.data && data.data.token) {
+    bru.setEnvVar("ADMIN_TOKEN", data.data.token);
+  }
+}

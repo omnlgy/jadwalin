@@ -1,0 +1,22 @@
+meta {
+  name: Update User
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{BASE_URL}}/api/user/{{USER_ID}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "full_name": "Updated Name",
+    "address": "Jl. Baru No. 1"
+  }
+}

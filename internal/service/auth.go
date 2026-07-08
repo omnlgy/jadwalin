@@ -19,13 +19,13 @@ func NewAuthService(authRepo domain.AuthRepository) *AuthService {
 	}
 }
 
-func (s *AuthService) GenerateOTP(ctx context.Context, key string) error {
+func (s *AuthService) GenerateOTP(ctx context.Context, key string) (string, error) {
 	code := generateCode()
 	if err := s.authRepo.Create(ctx, key, code, 5*time.Minute); err != nil {
-		return err
+		return "", err
 	}
-	// todo: send otp via wa
-	return nil
+
+	return code, nil
 }
 
 func (s *AuthService) VerifyOTP(ctx context.Context, key, code string) error {

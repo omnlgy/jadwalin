@@ -1,0 +1,22 @@
+meta {
+  name: Login Verify
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{BASE_URL}}/api/auth/login-verify
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "phone": "+6289666955155",
+    "otp": "093823"
+  }
+}

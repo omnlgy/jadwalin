@@ -1,0 +1,24 @@
+meta {
+  name: Register Staff
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BASE_URL}}/api/user/register-staff
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "phone_number": "+6281111111117",
+    "email": "newstaff@example.com",
+    "full_name": "New Staff",
+    "address": "Jl. Example No. 1"
+  }
+}

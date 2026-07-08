@@ -19,7 +19,7 @@ func UserRoutes(router *gin.Engine, controller controller.User) {
 
 	user.POST("/register-staff", middleware.AuthMiddleware(), middleware.RequireRole("admin"), controller.RegisterStaff)
 	user.POST("/verify", controller.VerifyUser)
-	user.GET("/list", middleware.AuthMiddleware(), controller.ListUsers)
+	user.GET("/list", controller.ListUsers)
 	user.PUT("/:id", middleware.AuthMiddleware(), controller.UpdateUser)
 	user.DELETE("/:id", middleware.AuthMiddleware(), middleware.RequireRole("admin"), controller.DeleteUser)
 }

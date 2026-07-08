@@ -1,0 +1,18 @@
+meta {
+  name: List Users
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{BASE_URL}}/api/user/list?role=admin&page={{page}}&limit={{limit}}&search=example
+  body: none
+  auth: inherit
+}
+
+params:query {
+  role: admin
+  page: {{page}}
+  limit: {{limit}}
+  search: example
+}

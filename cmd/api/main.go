@@ -13,6 +13,7 @@ import (
 	"github.com/omnlgy/jadwalin/internal/controller"
 	"github.com/omnlgy/jadwalin/internal/db"
 	"github.com/omnlgy/jadwalin/internal/models"
+	"github.com/omnlgy/jadwalin/internal/provider"
 	"github.com/omnlgy/jadwalin/internal/repository"
 	"github.com/omnlgy/jadwalin/internal/router"
 	"github.com/omnlgy/jadwalin/internal/service"
@@ -68,13 +69,17 @@ func main() {
 	userRepo := repository.NewUserRepository(posgreDb)
 	authRepo := repository.NewAuthRepository(rDb)
 
+	// Initialize notification provider
+	waProvider := provider.NewWhatsAppProvider(cfg.GOWA_URL, cfg.GOWA_DEVICE_ID)
+
 	// Initialize services
 	userService := service.NewUserService(userRepo)
 	authService := service.NewAuthService(authRepo)
+	notificationService := service.NewNotificationService(waProvider, nil)
 
 	// Initialize controllers
-	authController := controller.NewAuthController(authService, userService)
-	userController := controller.NewUserController(userService, authService)
+	authController := controller.NewAuthController(authService, userService, notificationService)
+	userController := controller.NewUserController(userService, authService, notificationService)
 
 	server := gin.New()
 	server.Use(gin.Logger())

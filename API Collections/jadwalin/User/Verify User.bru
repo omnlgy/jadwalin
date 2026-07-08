@@ -1,0 +1,22 @@
+meta {
+  name: Verify User
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{BASE_URL}}/api/user/verify
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "phone": "6281234567890",
+    "otp": "{{REGISTER_OTP}}"
+  }
+}
