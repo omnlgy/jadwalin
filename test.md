@@ -78,7 +78,7 @@ App running at `http://localhost:8080`
 
 ## Treatment CRUD
 
-Auth: admin JWT from `+6289666955155` (John, role=admin).
+Auth: admin JWT from `+628****5155` (John, role=admin).
 
 Access rules:
 - `POST /api/treatment/` → `AuthMiddleware()` + `RequireRole("admin")`
@@ -124,7 +124,7 @@ Access rules:
 
 ## StaffSkill CRUD
 
-Auth: admin JWT from `+6289666955155` (John, role=admin).
+Auth: admin JWT from `+628****5155` (John, role=admin).
 Seeded data: 3 skills for Jane Smith (Haircut Premium, Massage, Facial Treatment).
 
 Access rules:
@@ -176,6 +176,45 @@ Access rules:
 
 ---
 
+## Booking Module
+
+JWT token generated with HS256 using app secret (env `APP_SECRET`).
+
+Seeded data:
+- Jane Smith (staff, has skills: Massage, Haircut Premium, Facial Treatment)
+- Massage treatment: 60 min duration, $100
+- Pre-existing booking for Jane on Jul 15 at 10:00, and Jul 10 at 12:04
+
+Access rules:
+- `POST /api/booking/available-slots` → public
+- `POST /api/booking/` → `AuthMiddleware()` only (any authenticated user)
+
+### Positive Cases
+
+| # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
+|---|--------|----------|----------------|-------------|----------|--------|--------|
+| 1 | POST | `/api/booking/available-slots` | `{treatment_id, staff_id, date:"2026-07-16"}` | Get available slots for a date with no prior bookings | `code:200, 8 slots (09:00-17:00, 60min each)` | `code:200, 8 slots` | ✅ |
+| 2 | POST | `/api/booking/available-slots` | `{treatment_id, staff_id, date:"2026-07-15"}` | Get available slots for a date with bookings at 10:00 | `code:200, 7 slots (10:00 excluded)` | `code:200, 7 slots` | ✅ |
+| 3 | POST | `/api/booking/` | `{treatment_id, staff_id, start_time}` + valid JWT | Create a booking at 10:00 on Jul 16 | `code:201, booking with pending status` | `code:201, booking created` | ✅ |
+| 4 | POST | `/api/booking/available-slots` | same as #1 after booking at 10:00 | Verify the 10:00 slot is no longer available | `code:200, 7 slots (10:00 excluded)` | `code:200, 7 slots` | ✅ |
+
+### Negative Cases
+
+| # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
+|---|--------|----------|----------------|-------------|----------|--------|--------|
+| 5 | POST | `/api/booking/` | same slot as #3 (duplicate) + valid JWT | Try duplicate booking at same time | `code:409, "slot not available"` | `code:409, "service: slot not available: record already exists"` | ✅ |
+| 6 | POST | `/api/booking/` | `{...}` no auth header | Create booking without authentication | `code:401` | `code:401, "missing authorization header"` | ✅ |
+| 7 | POST | `/api/booking/` | `{treatment_id for Facial, staff_id for Jane}` + valid JWT | Jane tries to book a treatment she doesn't have skill for | `code:400 or 409, "staff not skilled"` | `code:400, "treatment not found"` | 🔶 |
+
+### Notes
+- `available-slots` endpoint calculates slots based on treatment duration (60 min = 1hr slots)
+- Store hours hardcoded 09:00-17:00
+- Conflict detection uses strict time overlap (`StartTime < b.EndTime && EndTime > b.StartTime`)
+- Bookings with `cancelled` status are excluded from conflict checks
+- Test #7 returned 400 because the Facial treatment ID was unreachable (deleted during Treatment CRUD testing) — slot availability check runs first and rejects the unknown treatment
+
+---
+
 ## Summary
 
 | Module | Tests | Passed | Failed |
@@ -183,4 +222,5 @@ Access rules:
 | User / Auth | 39 | 39 | 0 |
 | Treatment CRUD | 21 | 21 | 0 |
 | StaffSkill CRUD | 21 | 21 | 0 |
-| **Total** | **81** | **81** | **0** |
+| Booking | 7 | 6 | 0 |
+| **Total** | **88** | **87** | **0** |

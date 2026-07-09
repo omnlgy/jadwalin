@@ -1,0 +1,23 @@
+meta {
+  name: Create Booking
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL}}/api/booking/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "treatment_id": "{{TREATMENT_ID}}",
+    "staff_id": "{{STAFF_ID}}",
+    "start_time": "2025-10-15T10:00:00Z"
+  }
+}

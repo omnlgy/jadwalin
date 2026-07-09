@@ -17,6 +17,7 @@ type StaffSkillRepository interface {
 	ListByStaff(userID uuid.UUID) ([]StaffSkill, error)
 	ListByTreatment(treatmentID uuid.UUID) ([]StaffSkill, error)
 	ListAll(offset, limit int, search string) ([]StaffSkill, int64, error)
+	GetByStaffAndTreatment(staffID, treatmentID uuid.UUID) (*StaffSkill, error)
 }
 
 type StaffSkillService interface {

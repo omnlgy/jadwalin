@@ -1,7 +1,7 @@
 package dto
 
 type RegisterUserRequest struct {
-	PhoneNumber string `json:"phone_number" binding:"required,e164" example:"+6281234567890"`
+	PhoneNumber string `json:"phone_number" binding:"required,e164" example:"+628****7890"`
 	Email       string `json:"email" binding:"required,email" example:"john.doe@example.com"`
 	Address     string `json:"address" binding:"required" example:"Jl. Merdeka No. 1"`
 	FullName    string `json:"full_name" binding:"required" example:"John Doe"`
@@ -9,7 +9,7 @@ type RegisterUserRequest struct {
 }
 
 type VerifyUserRequest struct {
-	Phone string `json:"phone" binding:"required" example:"+6281234567890"`
+	Phone string `json:"phone" binding:"required" example:"+628****7890"`
 	OTP   string `json:"otp" binding:"required" example:"123456"`
 }
 
@@ -47,4 +47,16 @@ type UpdateTreatmentRequest struct {
 type AssignSkillRequest struct {
 	UserID      string `json:"user_id" binding:"required" example:"a1b2c3d4-e5f6-7890-1234-567890abcdef"`
 	TreatmentID string `json:"treatment_id" binding:"required" example:"a1b2c3d4-e5f6-7890-1234-567890abcdef"`
+}
+
+type GetAvailabelSlotRequest struct {
+	TreatmentID string `json:"treatment_id" binding:"required,uuid" example:"a1b2c3d4-e5f6-7890-1234-567890abcdef"`
+	StaffID     string `json:"staff_id" binding:"required,uuid" example:"a1b2c3d4-e5f6-7890-1234-567890abcdef"`
+	Date        string `json:"date" binding:"required,datetime=2006-01-02" example:"2025-10-15"`
+}
+
+type CreateBookingRequest struct {
+	TreatmentID string `json:"treatment_id" binding:"required,uuid"`
+	StaffID     string `json:"staff_id" binding:"required,uuid"`
+	StartTime   string `json:"start_time" binding:"required,datetime=2006-01-02T15:04:05Z07:00"`
 }

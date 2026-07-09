@@ -43,3 +43,9 @@ func UserRoutes(router *gin.Engine, controller controller.User) {
 	user.PUT("/:id", middleware.AuthMiddleware(), controller.UpdateUser)
 	user.DELETE("/:id", middleware.AuthMiddleware(), middleware.RequireRole("admin"), controller.DeleteUser)
 }
+
+func BookingRoutes(router *gin.Engine, ctrl controller.Booking) {
+	group := router.Group("/api/booking")
+	group.POST("/available-slots", ctrl.GetAvailableSlots)
+	group.POST("/", middleware.AuthMiddleware(), ctrl.CreateBooking)
+}

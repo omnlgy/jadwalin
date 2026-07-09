@@ -1,0 +1,23 @@
+meta {
+  name: Get Available Slots
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BASE_URL}}/api/booking/available-slots
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "treatment_id": "{{TREATMENT_ID}}",
+    "staff_id": "{{STAFF_ID}}",
+    "date": "2025-10-15"
+  }
+}

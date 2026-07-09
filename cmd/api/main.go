@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -18,6 +19,10 @@ import (
 	"github.com/omnlgy/jadwalin/internal/router"
 	"github.com/omnlgy/jadwalin/internal/service"
 )
+
+func init() {
+	time.Local = time.UTC
+}
 
 // @title Jadwalin API
 // @version 1.0
@@ -70,6 +75,7 @@ func main() {
 	authRepo := repository.NewAuthRepository(rDb)
 	treatmentRepo := repository.NewTreatmentRepository(posgreDb)
 	staffSkillRepo := repository.NewStaffSkillRepository(posgreDb)
+	bookingRepo := repository.NewBookingRepository(posgreDb)
 
 	// Initialize notification provider
 	waProvider := provider.NewWhatsAppProvider(cfg.GOWA_URL, cfg.GOWA_DEVICE_ID)
@@ -80,12 +86,14 @@ func main() {
 	notificationService := service.NewNotificationService(waProvider, nil)
 	treatmentService := service.NewTreatmentService(treatmentRepo)
 	staffSkillService := service.NewStaffSkillService(staffSkillRepo)
+	bookingService := service.NewBookingService(bookingRepo, userRepo, treatmentRepo, staffSkillRepo)
 
 	// Initialize controllers
 	authController := controller.NewAuthController(authService, userService, notificationService)
 	userController := controller.NewUserController(userService, authService, notificationService)
 	treatmentController := controller.NewTreatmentController(treatmentService)
 	staffSkillController := controller.NewStaffSkillController(staffSkillService)
+	bookingController := controller.NewBookingController(bookingService, treatmentService)
 
 	server := gin.New()
 	server.Use(gin.Logger())
@@ -95,6 +103,7 @@ func main() {
 	router.UserRoutes(server, *userController)
 	router.TreatmentRoutes(server, *treatmentController)
 	router.StaffSkillRoutes(server, *staffSkillController)
+	router.BookingRoutes(server, *bookingController)
 
 	// Add Swagger UI
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

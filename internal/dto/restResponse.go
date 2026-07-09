@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 type User struct {
 	Id          string `json:"id" example:"a1b2c3d4-e5f6-7890-1234-567890abcdef"`
 	PhoneNumber string `json:"phone_number" example:"+628****7890"`
@@ -88,4 +90,23 @@ type UnauthorizedResponse struct {
 type ForbiddenResponse struct {
 	Code    int    `json:"code" example:"403"`
 	Message string `json:"message" example:"forbidden"`
+}
+
+type Booking struct {
+	Id          string `json:"id"`
+	ClientID    string `json:"client_id"`
+	StaffID     string `json:"staff_id"`
+	TreatmentID string `json:"treatment_id"`
+	StartTime   string `json:"start_time"`
+	EndTime     string `json:"end_time"`
+	Status      string `json:"status"`
+}
+
+type AvailabelSlot struct {
+	StartTime time.Time `json:"start_time" example:"09:00"`
+	EndTime   time.Time `json:"end_time" example:"10:00"`
+}
+
+type GetAvailabelSlotResponse struct {
+	AvailableSlots []AvailabelSlot `json:"available_slots"`
 }

@@ -47,7 +47,7 @@ func (r *User) GetByID(id uuid.UUID) (*domain.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("repo: get user %s: %w", id, err)
 	}
-	return toDomain(&m), nil
+	return toDomainUser(&m), nil
 }
 
 func (r *User) GetByPhoneNumber(phoneNumber string) (*domain.User, error) {
@@ -59,7 +59,7 @@ func (r *User) GetByPhoneNumber(phoneNumber string) (*domain.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("repo: get user by phone %s: %w", phoneNumber, err)
 	}
-	return toDomain(&m), nil
+	return toDomainUser(&m), nil
 }
 
 func (r *User) Update(user *domain.User) error {
@@ -121,7 +121,7 @@ func (r *User) List(offset, limit int, search string, role domain.Role) ([]domai
 
 	users := make([]domain.User, len(ms))
 	for i, m := range ms {
-		users[i] = *toDomain(&m)
+		users[i] = *toDomainUser(&m)
 	}
 	return users, total, nil
 }
@@ -131,7 +131,7 @@ func isPgUniqueViolation(err error) bool {
 	return errors.As(err, &pgErr) && pgErr.Code == "23505"
 }
 
-func toDomain(m *models.User) *domain.User {
+func toDomainUser(m *models.User) *domain.User {
 	return &domain.User{
 		ID:          m.ID,
 		PhoneNumber: m.PhoneNumber,

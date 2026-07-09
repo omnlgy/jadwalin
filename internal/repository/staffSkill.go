@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -114,6 +115,18 @@ func (r *StaffSkill) ListAll(offset, limit int, search string) ([]domain.StaffSk
 	return sliceToDomainStaffSkill(ms), total, nil
 }
 
+func (r *StaffSkill) GetByStaffAndTreatment(staffID, treatmentID uuid.UUID) (*domain.StaffSkill, error) {
+	var m models.StaffSkill
+	err := r.db.Where("user_id = ? AND treatment_id = ?", staffID, treatmentID).First(&m).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("repo: staff skill not found for staff %s and treatment %s", staffID, treatmentID)
+		}
+		return nil, fmt.Errorf("repo: get staff skill %s: %w", staffID, err)
+	}
+	return toDomainStaffSkill(&m), nil
+}
+
 func toDomainStaffSkill(m *models.StaffSkill) *domain.StaffSkill {
 	ds := &domain.StaffSkill{
 		ID:          m.ID,
@@ -121,7 +134,7 @@ func toDomainStaffSkill(m *models.StaffSkill) *domain.StaffSkill {
 		TreatmentID: m.TreatmentID,
 	}
 	if m.User.ID != uuid.Nil {
-		ds.User = toDomain(&m.User)
+		ds.User = toDomainUser(&m.User)
 	}
 	if m.Treatment.ID != uuid.Nil {
 		ds.Treatment = toDomainTreatment(&m.Treatment)
