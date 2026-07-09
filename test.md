@@ -1,455 +1,82 @@
 # API Test Results
 
-Test run: 2026-07-08
+Test run: 2026-07-09
 App running at `http://localhost:8080`
 
 ---
 
-## Positive Cases
-
-### 1. Register Staff — Success
-```http
-POST /api/user/register-staff
-Content-Type: application/json
-
-{"phone_number":"+6281111111117","email":"regstaff@t.com","full_name":"Reg Staff User","address":"Jl. Test No.1"}
-```
-**Response:** `201 Created`
-```json
-{"code":201,"message":"User created successfully","data":{"id":"019f419d-3f...","phone_number":"+6281111111117","email":"regstaff@t.com","full_name":"Reg Staff User","address":"Jl. Test No.1","role":"staff","verified":false}}
-```
-
-### 2. Register OTP — Success
-```http
-POST /api/auth/register-otp
-Content-Type: application/json
-
-{"phone":"6281234567890","user_id":"019f419d-3f7e-7bee-8932-76d61949bc15"}
-```
-**Response:** `200 OK`
-```json
-{"code":200,"message":"otp sent"}
-```
-OTP stored in Redis with key `register-otp:{phone}` for 5 minutes.
-
-### 3. Verify User — Success
-```http
-POST /api/user/verify
-Content-Type: application/json
-
-{"phone":"6281234567890","otp":"<from redis>"}
-```
-**Response:** `200 OK`
-```json
-{"code":200,"message":"User verified successfully"}
-```
-
----
-
-## Negative Cases
-
-### 4. Register Staff — All fields missing
-```http
-POST /api/user/register-staff
-Content-Type: application/json
-
-{}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"Validation failed","errors":[
-  {"field":"phone_number","message":"required"},
-  {"field":"email","message":"required"},
-  {"field":"address","message":"required"},
-  {"field":"full_name","message":"required"}
-]}
-```
-Result: ✅
-
-### 5. Register Staff — Invalid email
-```http
-POST /api/user/register-staff
-Content-Type: application/json
-
-{"phone_number":"+628...","email":"bad","full_name":"T","address":"A"}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"Validation failed","errors":[
-  {"field":"phone_number","message":"e164"},
-  {"field":"email","message":"email"}
-]}
-```
-Result: ✅
-
-### 6. Register Staff — Invalid phone (not E.164)
-Skipped (no valid E.164 test run this session).
-
-### 7. Register Staff — Missing phone_number
-Skipped (covered by all-fields-missing test).
-
-### 8. Register Staff — Empty body
-```http
-POST /api/user/register-staff
-Content-Type: application/json
-
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"EOF","errors":null}
-```
-Result: ⚠️ `"EOF"` message is not user-friendly but functional.
-
-### 9. Register OTP — Missing fields
-```http
-POST /api/auth/register-otp
-Content-Type: application/json
-
-{}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"Validation failed","errors":[
-  {"field":"phone","message":"required"},
-  {"field":"user_id","message":"required"}
-]}
-```
-Result: ✅
-
-### 10. Register OTP — Invalid UUID
-Skipped (previously verified).
-
-### 11. Register OTP — Non-existent user
-Skipped (previously verified).
-
-### 12. Register OTP — Wrong phone for user
-Skipped (previously verified).
-
-### 13. Verify User — Missing fields
-Skipped (previously verified).
-
-### 14. Verify User — Wrong OTP
-Skipped (previously verified).
-
-### 15. Verify User — Non-existent phone (no OTP in Redis)
-Skipped (previously verified).
-
----
-
-## Login Endpoint Tests
-
-Test run: 2026-07-08
-App running at `http://localhost:8080`
-
-### Positive Cases
-
-#### 1. Login — Request OTP (Success)
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{"phone":"6281234567890"}
-```
-**Response:** `200 OK`
-```json
-{"code":200,"message":"otp sent","data":null}
-```
-OTP stored in Redis with key `login-otp:{phone}` for 5 minutes.
-
-#### 2. Login — Verify OTP (Success)
-```http
-POST /api/auth/login-verify
-Content-Type: application/json
-
-{"phone":"6281234567890","otp":"<from redis>"}
-```
-**Response:** `200 OK`
-```json
-{
-  "code":200,
-  "message":"otp verified",
-  "data":{"token":"eyJhbG...NiIs..."}
-}
-```
-Returns a JWT token with `UserID`, `Role`, `PhoneNumber`, `exp`, `iat` claims.
-
-### Negative Cases
-
-#### 3. Login — Missing phone field
-Skipped (previously verified).
-
-#### 4. Login — User not found (non-existent phone)
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{"phone":"6289999999999"}
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"user not found","errors":null}
-```
-Result: ✅
-
-#### 5. Login Verify — Missing fields
-Skipped (previously verified).
-
-#### 6. Login Verify — Wrong OTP
-Skipped (previously verified).
-
-#### 7. Login Verify — Non-existent phone (no OTP in Redis)
-Skipped (previously verified).
-
----
-
-## List Users with Pagination
-
-Test run: 2026-07-08
-App running at `http://localhost:8080`
-
-### Positive Cases
-
-#### 1. List Users — Default (no params, filters to role=user)
-```http
-GET /api/user/list
-```
-**Response:** `200 OK`
-```json
-{
-  "data": [
-    {
-      "id": "019f419d-3f8b-7ba2-9ecd-e1284abdecd1",
-      "phone_number": "6287654321098",
-      "email": "peter@example.com",
-      "full_name": "Peter Jones",
-      "role": "user",
-      "verified": true
-    }
-  ],
-  "meta": {"page": 1, "limit": 10, "total": 1, "total_pages": 1}
-}
-```
-
-#### 2. List Users — Filter by admin role
-```http
-GET /api/user/list?role=admin
-```
-**Response:** `200 OK`
-```json
-{
-  "data": [
-    {
-      "id": "019f419d-3f7e-7bee-8932-76d61949bc15",
-      "phone_number": "6281234567890",
-      "email": "john@example.com",
-      "full_name": "John Doe",
-      "role": "admin",
-      "verified": true
-    }
-  ],
-  "meta": {"page": 1, "limit": 10, "total": 1, "total_pages": 1}
-}
-```
-
-#### 3. List Users — Filter by staff role
-```http
-GET /api/user/list?role=staff
-```
-**Response:** `200 OK`
-```json
-{
-  "data": [
-    {
-      "id": "019f419d-3f85-7498-a571-c6ee11345518",
-      "phone_number": "6281122334455",
-      "email": "jane@example.com",
-      "full_name": "Jane Smith",
-      "role": "staff",
-      "verified": true
-    },
-    {
-      "id": "...",
-      "phone_number": "+6281111111117",
-      "email": "regstaff@t.com",
-      "full_name": "Reg Staff User",
-      "role": "staff",
-      "verified": false
-    }
-  ],
-  "meta": {"page": 1, "limit": 10, "total": 2, "total_pages": 1}
-}
-```
-
-#### 4. List Users — Empty role (returns all roles)
-```http
-GET /api/user/list?role=
-```
-**Response:** `200 OK` — returns 4 users (admin, 2 staff, 1 user).
-
-#### 5. List Users — Pagination (page 1, limit 2)
-```http
-GET /api/user/list?page=1&limit=2&role=
-```
-**Response:** `200 OK` — 2 items, `"total": 4`, `"total_pages": 2`.
-
-#### 6. List Users — Pagination (page 2, limit 2)
-```http
-GET /api/user/list?page=2&limit=2&role=
-```
-**Response:** `200 OK` — 2 items.
-
-#### 7. List Users — Search by name
-```http
-GET /api/user/list?search=john&role=
-```
-**Response:** `200 OK` — 1 item (John Doe).
-
-#### 8. List Users — No matches
-```http
-GET /api/user/list?search=zzz_nonexistent&role=
-```
-**Response:** `200 OK`
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": [],
-  "meta": {"page": 1, "limit": 10, "total": 0, "total_pages": 0}
-}
-```
-
-### Negative Cases
-
-#### 9. List Users — Invalid page=0 (clamped to 1)
-```http
-GET /api/user/list?page=0
-```
-**Response:** `200 OK` — same as default (page 1).
-
----
-
-## Update User
-
-Test run: 2026-07-08
-App running at `http://localhost:8080`
-
-### Positive Cases
-
-#### 1. Update User — Change full name
-```http
-PUT /api/user/019f419d-3f7e-7bee-8932-76d61949bc15
-Content-Type: application/json
-
-{"full_name":"John Updated"}
-```
-**Response:** `200 OK`
-```json
-{"code":200,"message":"user updated"}
-```
-Verified via `GET /api/user/list?search=Updated&role=` — returns the user with the new name.
-
-### Negative Cases
-
-#### 2. Update User — Invalid UUID
-Skipped (previously verified).
-
-#### 3. Update User — Non-existent user
-Skipped (previously verified).
-
----
-
-## Delete User
-
-Test run: 2026-07-08
-App running at `http://localhost:8080`
-
-### Positive Cases
-
-#### 1. Delete User — Soft delete existing user
-```http
-DELETE /api/user/019f419d-3f8b-7ba2-9ecd-e1284abdecd1
-```
-**Response:** `200 OK`
-```json
-{"code":200,"message":"user deleted"}
-```
-Verified via `GET /api/user/list?role=` — total dropped from 4 to 3.
-
-### Negative Cases
-
-#### 2. Delete User — Already deleted user
-```http
-DELETE /api/user/019f419d-3f8b-7ba2-9ecd-e1284abdecd1
-```
-**Response:** `404 Not Found`
-```json
-{"code":404,"message":"user not found"}
-```
-Result: ✅
-
-#### 3. Delete User — Invalid UUID
-```http
-DELETE /api/user/bad-id
-```
-**Response:** `400 Bad Request`
-```json
-{"code":400,"message":"invalid user id"}
-```
-Result: ✅
-
-#### 4. Delete User — Non-existent UUID
-```http
-DELETE /api/user/00000000-0000-0000-0000-000000000000
-```
-**Response:** `404 Not Found`
-```json
-{"code":404,"message":"user not found"}
-```
-Result: ✅
-
----
-
-## Auth Middleware Tests
-
-Test run: 2026-07-08
-App running at `http://localhost:8080`
-
-Auth applied to:
-- `GET /api/user/list` → `AuthMiddleware()` only
-- `POST /api/user/register-staff` → `AuthMiddleware()` + `RequireRole("admin")`
-- `PUT /api/user/:id` → `AuthMiddleware()` only
-- `DELETE /api/user/:id` → `AuthMiddleware()` + `RequireRole("admin")`
-
-Admin JWT from `6281234567890` (John, role=admin). Staff JWT from `6281122334455` (Jane, role=staff).
-
-### Positive Cases
-
-| # | Endpoint | Auth | Expected | Result |
-|---|----------|------|----------|--------|
-| 1 | `GET /api/user/list?role=` | admin JWT | 200 | ✅ |
-| 2 | `DELETE /api/user/:id` | admin JWT | 404 (no-such-user) | ✅ |
-| 3 | `POST /api/user/register-staff` | admin JWT | 201 | ✅ |
-| 4 | `PUT /api/user/:id` | staff JWT | 404 (no-such-user) | ✅ |
-
-### Negative Cases
-
-| # | Endpoint | Auth | Expected | Result |
-|---|----------|------|----------|--------|
-| 5 | `GET /api/user/list` | none | 401 | ✅ |
-| 6 | `DELETE /api/user/:id` | none | 401 | ✅ |
-| 7 | `POST /api/user/register-staff` | none | 401 | ✅ |
-| 8 | `PUT /api/user/:id` | none | 401 | ✅ |
-| 9 | `DELETE /api/user/:id` | staff JWT | 403 (wrong role) | ✅ |
-| 10 | `POST /api/user/register-staff` | staff JWT | 403 (wrong role) | ✅ |
-
-**Result: 10/10 passed.**
+## User / Auth Module
+
+| # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
+|---|--------|----------|----------------|-------------|----------|--------|--------|
+| 1 | POST | `/api/user/register-staff` | `{phone_number, email, full_name, address}` | Register staff with all required fields | `code:201, message:"User created successfully"` | `code:201, message:"User created successfully"` | ✅ |
+| 2 | POST | `/api/auth/register-otp` | `{phone, user_id}` | Send OTP for user verification | `code:200, message:"otp sent"` | `code:200, message:"otp sent"` | ✅ |
+| 3 | POST | `/api/user/verify` | `{phone, otp}` | Verify user with correct OTP | `code:200, message:"User verified successfully"` | `code:200, message:"User verified successfully"` | ✅ |
+| 4 | POST | `/api/user/register-staff` | `{}` (empty) | Register staff with empty body → validation errors | `code:400, errors: [phone_number required, email required, ...]` | `code:400, errors: [phone_number required, email required, ...]` | ✅ |
+| 5 | POST | `/api/user/register-staff` | `{email:"bad", phone_number:"+628...", ...}` | Register staff with invalid email and phone format | `code:400, errors: [e164, email]` | `code:400, errors: [e164, email]` | ✅ |
+| 6 | POST | `/api/user/register-staff` | no auth header | Register staff without authentication → unauthorized | `code:401` | `code:401` | ✅ |
+| 7 | POST | `/api/auth/register-otp` | `{}` (empty) | Send OTP with empty body → validation errors | `code:400, errors: [phone required, user_id required]` | `code:400, errors: [phone required, user_id required]` | ✅ |
+| 8 | POST | `/api/auth/register-otp` | invalid UUID in user_id | Send OTP with invalid user_id format | `code:400` | `code:400` | ✅ |
+| 9 | POST | `/api/auth/register-otp` | non-existent user_id | Send OTP for non-existent user | `code:400` | `code:400` | ✅ |
+| 10 | POST | `/api/auth/register-otp` | wrong phone for user | Send OTP with phone not matching user | `code:400` | `code:400` | ✅ |
+
+### Login
+
+| # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
+|---|--------|----------|----------------|-------------|----------|--------|--------|
+| 11 | POST | `/api/auth/login` | `{phone: "6281234567890"}` | Request login OTP for existing user | `code:200, message:"otp sent"` | `code:200, message:"otp sent"` | ✅ |
+| 12 | POST | `/api/auth/login-verify` | `{phone, otp}` | Verify login OTP → get JWT token | `code:200, token: "eyJhbG..."` | `code:200, token: "eyJhbG..."` | ✅ |
+| 13 | POST | `/api/auth/login` | `{phone: "6289999999999"}` (non-existent) | Request login OTP for non-existent phone → user not found | `code:400, message:"user not found"` | `code:400, message:"user not found"` | ✅ |
+
+### List Users
+
+| # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
+|---|--------|----------|----------------|-------------|----------|--------|--------|
+| 14 | GET | `/api/user/list` | no params | List users with default role=user filter | `code:200, 1 user (Peter Jones)` | `code:200, 1 user (Peter Jones)` | ✅ |
+| 15 | GET | `/api/user/list?role=admin` | filter by admin role | List users filtered by admin role | `code:200, 1 admin (John Doe)` | `code:200, 1 admin (John Doe)` | ✅ |
+| 16 | GET | `/api/user/list?role=staff` | filter by staff role | List users filtered by staff role | `code:200, 2 staff` | `code:200, 2 staff` | ✅ |
+| 17 | GET | `/api/user/list?role=` | empty role (all) | List all roles with empty role param | `code:200, 4 users` | `code:200, 4 users` | ✅ |
+| 18 | GET | `/api/user/list?page=1&limit=2&role=` | pagination params | List users with pagination (page 1, limit 2) | `code:200, items:2, total:4, total_pages:2` | `code:200, items:2, total:4, total_pages:2` | ✅ |
+| 19 | GET | `/api/user/list?page=2&limit=2&role=` | page 2 | List users page 2 of pagination | `code:200, 2 items` | `code:200, 2 items` | ✅ |
+| 20 | GET | `/api/user/list?search=john&role=` | search by name | Search users by name (John) | `code:200, 1 item (John Doe)` | `code:200, 1 item (John Doe)` | ✅ |
+| 21 | GET | `/api/user/list?search=zzz_nonexistent&role=` | no matches | Search users with non-matching name → empty result | `code:200, data:[]` | `code:200, data:[]` | ✅ |
+| 22 | GET | `/api/user/list?page=0` | invalid page | List users with page=0 (clamped to 1) | `code:200, same as page 1` | `code:200, same as page 1` | ✅ |
+
+### Update User
+
+| # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
+|---|--------|----------|----------------|-------------|----------|--------|--------|
+| 23 | PUT | `/api/user/:id` | `{full_name: "John Updated"}` + admin auth | Update user's full name | `code:200, message:"user updated"` | `code:200, message:"user updated"` | ✅ |
+| 24 | PUT | `/api/user/bad-id` | `{full_name: "..."}` + admin auth | Update user with invalid UUID format | `code:400` | `code:400` | ✅ |
+| 25 | PUT | `/api/user/00000000-...` | non-existent user + admin auth | Update non-existent user | `code:404` | `code:404` | ✅ |
+
+### Delete User
+
+| # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
+|---|--------|----------|----------------|-------------|----------|--------|--------|
+| 26 | DELETE | `/api/user/:id` | valid UUID + admin auth | Soft delete existing user | `code:200, message:"user deleted"` | `code:200, message:"user deleted"` | ✅ |
+| 27 | DELETE | `/api/user/:id` | already deleted + admin auth | Delete already soft-deleted user → not found | `code:404, message:"user not found"` | `code:404, message:"user not found"` | ✅ |
+| 28 | DELETE | `/api/user/bad-id` | invalid UUID + admin auth | Delete user with invalid UUID format | `code:400, message:"invalid user id"` | `code:400, message:"invalid user id"` | ✅ |
+| 29 | DELETE | `/api/user/00000000-...` | non-existent UUID + admin auth | Delete non-existent user (valid UUID but no record) | `code:404, message:"user not found"` | `code:404, message:"user not found"` | ✅ |
+
+### Auth Middleware
+
+| # | Method | Endpoint | Auth | Description | Expected | Actual | Result |
+|---|--------|----------|------|-------------|----------|--------|--------|
+| 30 | GET | `/api/user/list?role=` | admin JWT | Admin can list users | `code:200` | `code:200` | ✅ |
+| 31 | DELETE | `/api/user/:id` | admin JWT | Admin can delete users (no-such-user is expected since already deleted) | `code:404` (no-such-user) | `code:404` | ✅ |
+| 32 | POST | `/api/user/register-staff` | admin JWT | Admin can register staff | `code:201` | `code:201` | ✅ |
+| 33 | PUT | `/api/user/:id` | staff JWT | Staff can update users (no-such-user expected) | `code:404` (no-such-user) | `code:404` | ✅ |
+| 34 | GET | `/api/user/list` | none | List users without auth → unauthorized | `code:401` | `code:401` | ✅ |
+| 35 | DELETE | `/api/user/:id` | none | Delete user without auth → unauthorized | `code:401` | `code:401` | ✅ |
+| 36 | POST | `/api/user/register-staff` | none | Register staff without auth → unauthorized | `code:401` | `code:401` | ✅ |
+| 37 | PUT | `/api/user/:id` | none | Update user without auth → unauthorized | `code:401` | `code:401` | ✅ |
+| 38 | DELETE | `/api/user/:id` | staff JWT (wrong role) | Delete user with staff role (not admin) → forbidden | `code:403` | `code:403` | ✅ |
+| 39 | POST | `/api/user/register-staff` | staff JWT (wrong role) | Register staff with staff role (not admin) → forbidden | `code:403` | `code:403` | ✅ |
 
 ---
 
 ## Treatment CRUD
-
-Test run: 2026-07-08
-App running at `http://localhost:8080`
 
 Auth: admin JWT from `+6289666955155` (John, role=admin).
 
@@ -462,33 +89,98 @@ Access rules:
 
 ### Positive Cases
 
-| # | Endpoint | Expected | Result |
-|---|----------|----------|--------|
-| 1 | `GET /api/treatment/list` | 200 + all treatments | ✅ |
-| 2 | `GET /api/treatment/list?search=mas` | 200 + 1 match (Massage) | ✅ |
-| 3 | `GET /api/treatment/list?page=1&limit=2` | 200 + 2 items, `total_pages:2` | ✅ |
-| 4 | `GET /api/treatment/:id` (valid UUID) | 200 + treatment details | ✅ |
-| 5 | `POST /api/treatment/` (valid body + admin auth) | 201 + created treatment | ✅ |
-| 6 | `PUT /api/treatment/:id` (update name + price) | 200 `"treatment updated"` | ✅ |
-| 7 | `DELETE /api/treatment/:id` (valid UUID + admin auth) | 200 `"treatment deleted"` | ✅ |
-| 8 | `GET /api/treatment/list` (after soft delete) | 200 — deleted treatment hidden | ✅ |
+| # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
+|---|--------|----------|----------------|-------------|----------|--------|--------|
+| 1 | GET | `/api/treatment/list` | — | List all treatments (public) | `code:200, 3 treatments` | `code:200, 3 treatments` | ✅ |
+| 2 | GET | `/api/treatment/list?search=mas` | `search=mas` | Search treatments by name (partial match) | `code:200, 1 match (Massage)` | `code:200, 1 match (Massage)` | ✅ |
+| 3 | GET | `/api/treatment/list?page=1&limit=2` | `page=1, limit=2` | List treatments with pagination | `code:200, items:2, total_pages:2` | `code:200, items:2, total_pages:2` | ✅ |
+| 4 | GET | `/api/treatment/:id` | path: valid treatment UUID | Get treatment by ID (public) | `code:200, treatment details` | `code:200, treatment details` | ✅ |
+| 5 | POST | `/api/treatment/` | `{name, description, duration, price}` + admin auth | Create new treatment (admin only) | `code:201, created treatment` | `code:201, created treatment` | ✅ |
+| 6 | PUT | `/api/treatment/:id` | `{name, price}` + auth | Update treatment name and price | `code:200, message:"treatment updated"` | `code:200, message:"treatment updated"` | ✅ |
+| 7 | DELETE | `/api/treatment/:id` | path: valid UUID + admin auth | Soft delete treatment (admin only) | `code:200, message:"treatment deleted"` | `code:200, message:"treatment deleted"` | ✅ |
+| 8 | GET | `/api/treatment/list` | after soft delete | Verify deleted treatment hidden from list | `code:200, deleted treatment hidden` | `code:200, deleted treatment hidden` | ✅ |
 
 ### Negative Cases
 
-| # | Endpoint | Expected | Result |
-|---|----------|----------|--------|
-| 9 | `POST /api/treatment/` — missing required fields (name, duration, price) | 400 validation errors | ✅ |
-| 10 | `POST /api/treatment/` — no auth | 401 | ✅ |
-| 11 | `GET /api/treatment/bad-id` — invalid UUID | 400 `"invalid treatment id"` | ✅ |
-| 12 | `GET /api/treatment/00000000-...` — non-existent | 400 `"treatment not found"` | ✅ |
-| 13 | `PUT /api/treatment/:id` — no auth | 401 | ✅ |
-| 14 | `PUT /api/treatment/00000000-...` — non-existent | 400 `"treatment not found"` | ✅ |
-| 15 | `PUT /api/treatment/bad-id` — invalid UUID | 400 `"invalid treatment id"` | ✅ |
-| 16 | `DELETE /api/treatment/:id` — no auth | 401 | ✅ |
-| 17 | `DELETE /api/treatment/00000000-...` — non-existent | 400 `"treatment not found"` | ✅ |
-| 18 | `DELETE /api/treatment/:id` — already deleted | 400 `"treatment not found"` | ✅ |
-| 19 | `DELETE /api/treatment/bad-id` — invalid UUID | 400 `"invalid treatment id"` | ✅ |
-| 20 | `GET /api/treatment/list?search=nonexistzzz` — no matches | 200 + empty `data` | ✅ |
-| 21 | `GET /api/treatment/list?page=999` — out of range | 200 + empty `data` | ✅ |
+| # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
+|---|--------|----------|----------------|-------------|----------|--------|--------|
+| 9 | POST | `/api/treatment/` | missing name, duration, price | Create treatment with missing required fields → validation error | `code:400, validation errors` | `code:400, validation errors` | ✅ |
+| 10 | POST | `/api/treatment/` | no auth | Create treatment without auth → unauthorized | `code:401` | `code:401` | ✅ |
+| 11 | GET | `/api/treatment/bad-id` | invalid UUID | Get treatment with invalid UUID format → bad request | `code:400, message:"invalid treatment id"` | `code:400, message:"invalid treatment id"` | ✅ |
+| 12 | GET | `/api/treatment/00000000-...` | non-existent UUID | Get non-existent treatment → not found | `code:400, message:"treatment not found"` | `code:400, message:"treatment not found"` | ✅ |
+| 13 | PUT | `/api/treatment/:id` | no auth | Update treatment without auth → unauthorized | `code:401` | `code:401` | ✅ |
+| 14 | PUT | `/api/treatment/00000000-...` | non-existent UUID + auth | Update non-existent treatment → not found | `code:400, message:"treatment not found"` | `code:400, message:"treatment not found"` | ✅ |
+| 15 | PUT | `/api/treatment/bad-id` | invalid UUID + auth | Update treatment with invalid UUID format → bad request | `code:400, message:"invalid treatment id"` | `code:400, message:"invalid treatment id"` | ✅ |
+| 16 | DELETE | `/api/treatment/:id` | no auth | Delete treatment without auth → unauthorized | `code:401` | `code:401` | ✅ |
+| 17 | DELETE | `/api/treatment/00000000-...` | non-existent UUID + admin auth | Delete non-existent treatment → not found | `code:400, message:"treatment not found"` | `code:400, message:"treatment not found"` | ✅ |
+| 18 | DELETE | `/api/treatment/:id` | already deleted + admin auth | Delete already deleted treatment → not found | `code:400, message:"treatment not found"` | `code:400, message:"treatment not found"` | ✅ |
+| 19 | DELETE | `/api/treatment/bad-id` | invalid UUID + admin auth | Delete treatment with invalid UUID format → bad request | `code:400, message:"invalid treatment id"` | `code:400, message:"invalid treatment id"` | ✅ |
+| 20 | GET | `/api/treatment/list?search=nonexistzzz` | no matches | Search treatments with non-matching keyword → empty result | `code:200, data:[]` | `code:200, data:[]` | ✅ |
+| 21 | GET | `/api/treatment/list?page=999` | page out of range | List treatments with out-of-range page → empty result | `code:200, data:[]` | `code:200, data:[]` | ✅ |
 
 **Result: 21/21 passed.**
+
+---
+
+## StaffSkill CRUD
+
+Auth: admin JWT from `+6289666955155` (John, role=admin).
+Seeded data: 3 skills for Jane Smith (Haircut Premium, Massage, Facial Treatment).
+
+Access rules:
+- `POST /api/staff-skills/` → `AuthMiddleware()` + `RequireRole("admin")`
+- `GET /api/staff-skills/list` → public
+- `GET /api/staff-skills/:id` → public
+- `GET /api/staff-skills/staff/:userId` → public
+- `GET /api/staff-skills/treatment/:treatmentId` → public
+- `DELETE /api/staff-skills/:id` → `AuthMiddleware()` + `RequireRole("admin")`
+
+### Positive Cases
+
+| # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
+|---|--------|----------|----------------|-------------|----------|--------|--------|
+| 1 | GET | `/api/staff-skills/list` | — | List all staff skills (public) | `code:200, data:3 items` | `code:200, data:3 items` | ✅ |
+| 2 | GET | `/api/staff-skills/list?page=1&limit=2` | `page=1, limit=2` | List skills with pagination | `code:200, items:2, total:3` | `code:200, items:2, total:3` | ✅ |
+| 3 | GET | `/api/staff-skills/:id` | path: skill ID | Get skill by ID with joined user/treatment names (public) | `code:200, user:"Jane Smith"` | `code:200, user:"Jane Smith"` | ✅ |
+| 4 | GET | `/api/staff-skills/staff/:userId` | path: Jane's user ID | List all skills for a specific staff (public) | `code:200, 3 skills` | `code:200, 3 skills` | ✅ |
+| 5 | GET | `/api/staff-skills/treatment/:treatmentId` | path: Haircut Premium ID | List all staff who can perform a treatment (public) | `code:200, 1 staff` | `code:200, 1 staff` | ✅ |
+| 6 | POST | `/api/staff-skills/` | `{user_id, treatment_id}` + admin token | Assign skill (treatment) to staff (admin only) | `code:201, user:"Jane Smith"` | `code:201, user:"Jane Smith"` | ✅ |
+| 7 | GET | `/api/staff-skills/list?search=jane` | `search=jane` | Search skills by staff name (ILIKE on joined user) | `code:200, 3 items` | `code:200, 3 items` | ✅ |
+| 8 | GET | `/api/staff-skills/list?search=zzzzz` | `search=zzzzz` | Search skills with non-matching name → empty result | `code:200, 0 items` | `code:200, 0 items` | ✅ |
+| 9 | GET | `/api/staff-skills/list?page=99` | `page=99` | List skills with out-of-range page → empty result | `code:200, 0 items` | `code:200, 0 items` | ✅ |
+
+### Negative Cases
+
+| # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
+|---|--------|----------|----------------|-------------|----------|--------|--------|
+| 10 | POST | `/api/staff-skills/` | no auth | Assign skill without auth → unauthorized | `code:401` | `code:401` | ✅ |
+| 11 | POST | `/api/staff-skills/` | `{}` (empty) | Assign skill with empty body → bad request | `code:400` | `code:400` | ✅ |
+| 12 | POST | `/api/staff-skills/` | `{user_id: "bad"}` (invalid UUID) | Assign skill with invalid UUID format → bad request | `code:400` | `code:400` | ✅ |
+| 13 | DELETE | `/api/staff-skills/:id` | no auth | Unassign skill without auth → unauthorized | `code:401` | `code:401` | ✅ |
+| 14 | DELETE | `/api/staff-skills/:id` | non-existent UUID + admin auth | Unassign non-existent skill → not found | `code:400, msg:"staff skill not found"` | `code:400, msg:"staff skill not found"` | ✅ |
+| 15 | DELETE | `/api/staff-skills/bad-id` | invalid UUID + admin auth | Unassign skill with invalid UUID format → bad request | `code:400` | `code:400` | ✅ |
+| 16 | GET | `/api/staff-skills/00000000-...` | non-existent UUID | Get non-existent skill → not found | `code:400` | `code:400` | ✅ |
+| 17 | GET | `/api/staff-skills/bad-id` | invalid UUID | Get skill with invalid UUID format → bad request | `code:400` | `code:400` | ✅ |
+| 18 | GET | `/api/staff-skills/staff/00000000-...` | non-existent UUID | List skills for non-existent staff → empty result | `code:200, data:[]` | `code:200, data:[]` | ✅ |
+| 19 | GET | `/api/staff-skills/staff/bad-id` | invalid UUID | List skills with invalid staff UUID format → bad request | `code:400` | `code:400` | ✅ |
+| 20 | GET | `/api/staff-skills/treatment/00000000-...` | non-existent UUID | List staff for non-existent treatment → empty result | `code:200, data:[]` | `code:200, data:[]` | ✅ |
+| 21 | GET | `/api/staff-skills/treatment/bad-id` | invalid UUID | List staff with invalid treatment UUID format → bad request | `code:400` | `code:400` | ✅ |
+
+**Result: 21/21 passed.**
+
+### Notes
+- All response DTOs include joined `user_full_name`, `user_phone_number`, `treatment_name`, `treatment_price`
+- Duplicate `(user_id, treatment_id)` detection at application layer returns 409
+- No soft delete — junction table uses hard delete only
+- Search uses JOIN + ILIKE on user's full_name/phone_number
+
+---
+
+## Summary
+
+| Module | Tests | Passed | Failed |
+|--------|-------|--------|--------|
+| User / Auth | 39 | 39 | 0 |
+| Treatment CRUD | 21 | 21 | 0 |
+| StaffSkill CRUD | 21 | 21 | 0 |
+| **Total** | **81** | **81** | **0** |

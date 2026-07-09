@@ -1,0 +1,22 @@
+meta {
+  name: Assign Skill
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{BASE_URL}}/api/staff-skills/
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "user_id": "{{STAFF_ID}}",
+    "treatment_id": "{{TREATMENT_ID}}"
+  }
+}

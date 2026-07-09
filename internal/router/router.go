@@ -14,6 +14,16 @@ func AuthRoutes(router *gin.Engine, controller controller.Auth) {
 	auth.POST("/login-verify", controller.LoginVerify)
 }
 
+func StaffSkillRoutes(router *gin.Engine, ctrl controller.StaffSkill) {
+	group := router.Group("/api/staff-skills")
+	group.POST("/", middleware.AuthMiddleware(), middleware.RequireRole("admin"), ctrl.AssignSkill)
+	group.GET("/list", ctrl.ListAll)
+	group.GET("/:id", ctrl.GetStaffSkill)
+	group.GET("/staff/:userId", ctrl.ListByStaff)
+	group.GET("/treatment/:treatmentId", ctrl.ListByTreatment)
+	group.DELETE("/:id", middleware.AuthMiddleware(), middleware.RequireRole("admin"), ctrl.UnassignSkill)
+}
+
 func TreatmentRoutes(router *gin.Engine, controller controller.Treatment) {
 	treatment := router.Group("/api/treatment")
 

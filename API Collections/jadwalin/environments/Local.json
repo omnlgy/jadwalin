@@ -67,6 +67,18 @@
       "value": "",
       "type": "default",
       "secret": false
+    },
+    {
+      "name": "STAFF_ID",
+      "value": "",
+      "type": "default",
+      "secret": false
+    },
+    {
+      "name": "SKILL_ID",
+      "value": "",
+      "type": "default",
+      "secret": false
     }
   ]
 }

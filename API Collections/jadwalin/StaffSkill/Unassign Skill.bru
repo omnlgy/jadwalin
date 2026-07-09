@@ -1,0 +1,11 @@
+meta {
+  name: Unassign Skill
+  type: http
+  seq: 15
+}
+
+delete {
+  url: {{BASE_URL}}/api/staff-skills/{{SKILL_ID}}
+  body: none
+  auth: inherit
+}

@@ -43,3 +43,8 @@ type UpdateTreatmentRequest struct {
 	Duration    int     `json:"duration" binding:"omitempty,min=1" example:"30"`
 	Price       float64 `json:"price" binding:"omitempty,min=0" example:"50.00"`
 }
+
+type AssignSkillRequest struct {
+	UserID      string `json:"user_id" binding:"required" example:"a1b2c3d4-e5f6-7890-1234-567890abcdef"`
+	TreatmentID string `json:"treatment_id" binding:"required" example:"a1b2c3d4-e5f6-7890-1234-567890abcdef"`
+}

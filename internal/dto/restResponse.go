@@ -19,6 +19,16 @@ type Treatment struct {
 	Price       float64 `json:"price" example:"50.00"`
 }
 
+type StaffSkill struct {
+	Id              string  `json:"id"`
+	UserID          string  `json:"user_id"`
+	UserFullName    string  `json:"user_full_name"`
+	UserPhoneNumber string  `json:"user_phone_number"`
+	TreatmentID     string  `json:"treatment_id"`
+	TreatmentName   string  `json:"treatment_name"`
+	TreatmentPrice  float64 `json:"treatment_price"`
+}
+
 type FieldError struct {
 	Field   string `json:"field" example:"phone_number"`
 	Message string `json:"message" example:"invalid phone number"`

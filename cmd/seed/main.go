@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"time" // Added time import
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/omnlgy/jadwalin/internal/config"
@@ -12,7 +12,6 @@ import (
 )
 
 func main() {
-	// Load environment variables from .env file
 	cfg := config.Load()
 
 	db, err := db.NewPostgresDB(cfg)
@@ -22,20 +21,18 @@ func main() {
 
 	log.Println("Connected to database successfully.")
 
-	// Auto-migrate tables (creates table if not exists, no-op if already exists)
 	log.Println("Migrating database...")
-	if err := db.AutoMigrate(&models.User{}, &models.Treatment{}, &models.Booking{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Treatment{}, &models.Booking{}, &models.StaffSkill{}); err != nil {
 		log.Fatalf("Failed to auto-migrate: %v", err)
 	}
 	log.Println("Database migrated.")
 
-	// Check if users table already has data
+	// Seed users
 	var userCount int64
 	db.Model(&models.User{}).Count(&userCount)
 	if userCount > 0 {
 		log.Printf("Users table already has %d records, skipping seed.\n", userCount)
 	} else {
-		// Seed users
 		log.Println("Seeding users...")
 		users := []models.User{
 			{
@@ -68,8 +65,6 @@ func main() {
 		}
 
 		for i := range users {
-			// Manually generate UUIDv7 for seeding for consistency and to ensure it's set
-			// even if BeforeCreate hook is somehow bypassed or if we want specific UUIDs
 			newUUID, err := uuid.NewV7()
 			if err != nil {
 				log.Fatalf("Failed to generate UUIDv7: %v", err)
@@ -132,13 +127,11 @@ func main() {
 		log.Printf("Bookings table already has %d records, skipping seed.\n", bookingCount)
 	} else {
 		log.Println("Seeding bookings...")
-		// Fetch existing users and treatments to link bookings
 		var users []models.User
 		db.Find(&users)
 		var treatments []models.Treatment
 		db.Find(&treatments)
 
-		// Ensure we have enough data to create bookings
 		if len(users) < 3 || len(treatments) < 2 {
 			log.Println("Not enough users or treatments to seed bookings. Skipping booking seed.")
 		} else {
@@ -166,6 +159,43 @@ func main() {
 					log.Fatalf("Failed to create booking for client %s: %v", bookings[i].ClientID, err)
 				}
 				log.Printf("Created booking for client %s (ID: %s)\n", bookings[i].ClientID, bookings[i].ID)
+			}
+		}
+	}
+
+	// Seed staff skills
+	var staffSkillCount int64
+	db.Model(&models.StaffSkill{}).Count(&staffSkillCount)
+	if staffSkillCount > 0 {
+		log.Printf("StaffSkills table already has %d records, skipping seed.\n", staffSkillCount)
+	} else {
+		log.Println("Seeding staff skills...")
+		var users []models.User
+		db.Find(&users)
+		var treatments []models.Treatment
+		db.Find(&treatments)
+
+		var staffUser models.User
+		for _, u := range users {
+			if u.Role == string(domain.RoleStaff) {
+				staffUser = u
+				break
+			}
+		}
+
+		if staffUser.ID == uuid.Nil || len(treatments) == 0 {
+			log.Println("No staff user or treatments found. Skipping staff skill seed.")
+		} else {
+			for _, t := range treatments {
+				skill := models.StaffSkill{
+					UserID:      staffUser.ID,
+					TreatmentID: t.ID,
+				}
+				if err := db.Create(&skill).Error; err != nil {
+					log.Printf("Failed to assign skill %s -> %s: %v\n", staffUser.FullName, t.Name, err)
+				} else {
+					log.Printf("Assigned skill: %s -> %s (ID: %s)\n", staffUser.FullName, t.Name, skill.ID)
+				}
 			}
 		}
 	}

@@ -57,7 +57,7 @@ func main() {
 	}
 
 	// Auto-migrate tables on startup
-	if err := posgreDb.AutoMigrate(&models.User{}, &models.Treatment{}, &models.Booking{}); err != nil {
+	if err := posgreDb.AutoMigrate(&models.User{}, &models.Treatment{}, &models.Booking{}, &models.StaffSkill{}); err != nil {
 		fmt.Println("Failed to auto-migrate database:", err)
 		return
 	}
@@ -68,6 +68,8 @@ func main() {
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(posgreDb)
 	authRepo := repository.NewAuthRepository(rDb)
+	treatmentRepo := repository.NewTreatmentRepository(posgreDb)
+	staffSkillRepo := repository.NewStaffSkillRepository(posgreDb)
 
 	// Initialize notification provider
 	waProvider := provider.NewWhatsAppProvider(cfg.GOWA_URL, cfg.GOWA_DEVICE_ID)
@@ -76,17 +78,14 @@ func main() {
 	userService := service.NewUserService(userRepo)
 	authService := service.NewAuthService(authRepo)
 	notificationService := service.NewNotificationService(waProvider, nil)
-
-	// Initialize repositories
-	treatmentRepo := repository.NewTreatmentRepository(posgreDb)
-
-	// Initialize services
 	treatmentService := service.NewTreatmentService(treatmentRepo)
+	staffSkillService := service.NewStaffSkillService(staffSkillRepo)
 
 	// Initialize controllers
 	authController := controller.NewAuthController(authService, userService, notificationService)
 	userController := controller.NewUserController(userService, authService, notificationService)
 	treatmentController := controller.NewTreatmentController(treatmentService)
+	staffSkillController := controller.NewStaffSkillController(staffSkillService)
 
 	server := gin.New()
 	server.Use(gin.Logger())
@@ -95,6 +94,7 @@ func main() {
 	router.AuthRoutes(server, *authController)
 	router.UserRoutes(server, *userController)
 	router.TreatmentRoutes(server, *treatmentController)
+	router.StaffSkillRoutes(server, *staffSkillController)
 
 	// Add Swagger UI
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
