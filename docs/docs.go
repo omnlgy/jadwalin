@@ -44,7 +44,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.LoginRequest"
+                            "$ref": "#/definitions/dto.LoginRequest"
                         }
                     }
                 ],
@@ -52,19 +52,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
+                            "$ref": "#/definitions/dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
+                            "$ref": "#/definitions/dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -90,7 +90,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.VerifyUserRequest"
+                            "$ref": "#/definitions/dto.VerifyUserRequest"
                         }
                     }
                 ],
@@ -98,19 +98,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
+                            "$ref": "#/definitions/dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
+                            "$ref": "#/definitions/dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -136,7 +136,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.RegisterOTPRequest"
+                            "$ref": "#/definitions/dto.RegisterOTPRequest"
                         }
                     }
                 ],
@@ -144,19 +144,718 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
+                            "$ref": "#/definitions/dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
+                            "$ref": "#/definitions/dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/booking": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new booking (authenticated user)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Booking"
+                ],
+                "summary": "Create a new booking",
+                "parameters": [
+                    {
+                        "description": "Create Booking Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateBookingRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreatedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/booking/available-slots": {
+            "post": {
+                "description": "Returns all available time slots for a given treatment, staff, and date",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Booking"
+                ],
+                "summary": "Get available time slots for a treatment + staff + date",
+                "parameters": [
+                    {
+                        "description": "Get Available Slots Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetAvailabelSlotRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/booking/user/{userId}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns all bookings for a given user (must match authenticated user)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Booking"
+                ],
+                "summary": "Get bookings by user ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ForbiddenResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/staff-skills": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Assigns a treatment to a staff member (admin only)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "StaffSkill"
+                ],
+                "summary": "Assign a treatment skill to a staff",
+                "parameters": [
+                    {
+                        "description": "Assign Skill Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AssignSkillRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreatedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/staff-skills/list": {
+            "get": {
+                "description": "Returns a paginated list of all staff-skill assignments, with optional search by staff name",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "StaffSkill"
+                ],
+                "summary": "List all staff-skill assignments with pagination",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Page number (default 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Items per page (default 10, max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search keyword (matches staff name or phone)",
+                        "name": "search",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PaginatedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/staff-skills/staff/{userId}": {
+            "get": {
+                "description": "Returns all treatments a staff member can perform",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "StaffSkill"
+                ],
+                "summary": "List skills for a staff member",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/staff-skills/treatment/{treatmentId}": {
+            "get": {
+                "description": "Returns all staff members skilled at a given treatment",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "StaffSkill"
+                ],
+                "summary": "List staff who can perform a treatment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Treatment ID",
+                        "name": "treatmentId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/staff-skills/{id}": {
+            "get": {
+                "description": "Returns a single staff-skill assignment with joined user and treatment",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "StaffSkill"
+                ],
+                "summary": "Get a staff skill by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "StaffSkill ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Unassigns a treatment from a staff member (admin only)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "StaffSkill"
+                ],
+                "summary": "Remove a skill from a staff",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "StaffSkill ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/treatment": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new treatment (admin only)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Treatment"
+                ],
+                "summary": "Create a new treatment",
+                "parameters": [
+                    {
+                        "description": "Create Treatment Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateTreatmentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreatedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/treatment/list": {
+            "get": {
+                "description": "Returns a paginated list of treatments with optional search",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Treatment"
+                ],
+                "summary": "List treatments with pagination",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Page number (default 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Items per page (default 10, max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search keyword (matches name)",
+                        "name": "search",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PaginatedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/treatment/{id}": {
+            "get": {
+                "description": "Returns a single treatment",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Treatment"
+                ],
+                "summary": "Get a treatment by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Treatment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates an existing treatment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Treatment"
+                ],
+                "summary": "Update a treatment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Treatment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update Treatment Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateTreatmentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Deletes a treatment by ID (soft delete)",
+                "tags": [
+                    "Treatment"
+                ],
+                "summary": "Delete a treatment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Treatment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -218,13 +917,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.PaginatedResponse"
+                            "$ref": "#/definitions/dto.PaginatedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -255,7 +954,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.RegisterUserRequest"
+                            "$ref": "#/definitions/dto.RegisterUserRequest"
                         }
                     }
                 ],
@@ -263,19 +962,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.CreatedResponse"
+                            "$ref": "#/definitions/dto.CreatedResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
+                            "$ref": "#/definitions/dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -301,7 +1000,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.VerifyUserRequest"
+                            "$ref": "#/definitions/dto.VerifyUserRequest"
                         }
                     }
                 ],
@@ -309,19 +1008,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
+                            "$ref": "#/definitions/dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -359,7 +1058,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.UpdateUserRequest"
+                            "$ref": "#/definitions/dto.UpdateUserRequest"
                         }
                     }
                 ],
@@ -367,25 +1066,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
+                            "$ref": "#/definitions/dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
+                            "$ref": "#/definitions/dto.BadRequestResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
+                            "$ref": "#/definitions/dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -414,25 +1113,87 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse"
+                            "$ref": "#/definitions/dto.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
+                            "$ref": "#/definitions/dto.BadRequestResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse"
+                            "$ref": "#/definitions/dto.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse"
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/{id}/photo": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Uploads a photo for a specific user.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Upload a user photo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "User photo file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InternalErrorResponse"
                         }
                     }
                 }
@@ -440,7 +1201,24 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse": {
+        "dto.AssignSkillRequest": {
+            "type": "object",
+            "required": [
+                "treatment_id",
+                "user_id"
+            ],
+            "properties": {
+                "treatment_id": {
+                    "type": "string",
+                    "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                }
+            }
+        },
+        "dto.BadRequestResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -450,7 +1228,7 @@ const docTemplate = `{
                 "errors": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.FieldError"
+                        "$ref": "#/definitions/dto.FieldError"
                     }
                 },
                 "message": {
@@ -459,23 +1237,68 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_omnlgy_jadwalin_internal_dto.CreatedResponse": {
+        "dto.CreateBookingRequest": {
+            "type": "object",
+            "required": [
+                "staff_id",
+                "start_time",
+                "treatment_id"
+            ],
+            "properties": {
+                "staff_id": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "treatment_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateTreatmentRequest": {
+            "type": "object",
+            "required": [
+                "duration",
+                "name",
+                "price"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Standard haircut"
+                },
+                "duration": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 30
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Haircut"
+                },
+                "price": {
+                    "type": "number",
+                    "minimum": 0,
+                    "example": 50
+                }
+            }
+        },
+        "dto.CreatedResponse": {
             "type": "object",
             "properties": {
                 "code": {
                     "type": "integer",
                     "example": 201
                 },
-                "data": {
-                    "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.User"
-                },
+                "data": {},
                 "message": {
                     "type": "string",
                     "example": "User created successfully"
                 }
             }
         },
-        "github_com_omnlgy_jadwalin_internal_dto.FieldError": {
+        "dto.FieldError": {
             "type": "object",
             "properties": {
                 "field": {
@@ -488,7 +1311,42 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse": {
+        "dto.ForbiddenResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 403
+                },
+                "message": {
+                    "type": "string",
+                    "example": "forbidden"
+                }
+            }
+        },
+        "dto.GetAvailabelSlotRequest": {
+            "type": "object",
+            "required": [
+                "date",
+                "staff_id",
+                "treatment_id"
+            ],
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "example": "2025-10-15"
+                },
+                "staff_id": {
+                    "type": "string",
+                    "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                },
+                "treatment_id": {
+                    "type": "string",
+                    "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                }
+            }
+        },
+        "dto.InternalErrorResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -501,7 +1359,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_omnlgy_jadwalin_internal_dto.LoginRequest": {
+        "dto.LoginRequest": {
             "type": "object",
             "required": [
                 "phone"
@@ -513,7 +1371,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_omnlgy_jadwalin_internal_dto.Meta": {
+        "dto.Meta": {
             "type": "object",
             "properties": {
                 "limit": {
@@ -534,7 +1392,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_omnlgy_jadwalin_internal_dto.PaginatedResponse": {
+        "dto.PaginatedResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -547,11 +1405,11 @@ const docTemplate = `{
                     "example": "success"
                 },
                 "meta": {
-                    "$ref": "#/definitions/github_com_omnlgy_jadwalin_internal_dto.Meta"
+                    "$ref": "#/definitions/dto.Meta"
                 }
             }
         },
-        "github_com_omnlgy_jadwalin_internal_dto.RegisterOTPRequest": {
+        "dto.RegisterOTPRequest": {
             "type": "object",
             "required": [
                 "phone",
@@ -568,7 +1426,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_omnlgy_jadwalin_internal_dto.RegisterUserRequest": {
+        "dto.RegisterUserRequest": {
             "type": "object",
             "required": [
                 "address",
@@ -591,7 +1449,7 @@ const docTemplate = `{
                 },
                 "phone_number": {
                     "type": "string",
-                    "example": "+6281234567890"
+                    "example": "+628****7890"
                 },
                 "photo": {
                     "type": "string",
@@ -599,7 +1457,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_omnlgy_jadwalin_internal_dto.SuccessResponse": {
+        "dto.SuccessResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -613,7 +1471,30 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_omnlgy_jadwalin_internal_dto.UpdateUserRequest": {
+        "dto.UpdateTreatmentRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Standard haircut"
+                },
+                "duration": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 30
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Haircut"
+                },
+                "price": {
+                    "type": "number",
+                    "minimum": 0,
+                    "example": 50
+                }
+            }
+        },
+        "dto.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "address": {
@@ -638,44 +1519,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_omnlgy_jadwalin_internal_dto.User": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string",
-                    "example": "Jl. Merdeka No. 1"
-                },
-                "email": {
-                    "type": "string",
-                    "example": "john.doe@example.com"
-                },
-                "full_name": {
-                    "type": "string",
-                    "example": "John Doe"
-                },
-                "id": {
-                    "type": "string",
-                    "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
-                },
-                "phone_number": {
-                    "type": "string",
-                    "example": "+628****7890"
-                },
-                "photo": {
-                    "type": "string",
-                    "example": "http://example.com/photo.jpg"
-                },
-                "role": {
-                    "type": "string",
-                    "example": "staff"
-                },
-                "verified": {
-                    "type": "boolean",
-                    "example": true
-                }
-            }
-        },
-        "github_com_omnlgy_jadwalin_internal_dto.VerifyUserRequest": {
+        "dto.VerifyUserRequest": {
             "type": "object",
             "required": [
                 "otp",
@@ -688,7 +1532,7 @@ const docTemplate = `{
                 },
                 "phone": {
                     "type": "string",
-                    "example": "+6281234567890"
+                    "example": "+628****7890"
                 }
             }
         }

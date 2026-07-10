@@ -37,4 +37,5 @@ type UserService interface {
 	ListUsers(offset, limit int, search string, role Role) ([]User, int64, error)
 	UpdateUser(user *User) error
 	DeleteUser(id uuid.UUID) error
+	UploadPhoto(userID uuid.UUID, photoPath string) error
 }

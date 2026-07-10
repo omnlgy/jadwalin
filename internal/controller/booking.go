@@ -223,6 +223,19 @@ func (c *Booking) CreateBooking(ctx *gin.Context) {
 	})
 }
 
+// GetByUserID godoc
+// @Summary Get bookings by user ID
+// @Description Returns all bookings for a given user (must match authenticated user)
+// @Tags Booking
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param userId path string true "User ID"
+// @Success 200 {object} dto.SuccessResponse
+// @Failure 400 {object} dto.BadRequestResponse
+// @Failure 403 {object} dto.ForbiddenResponse
+// @Failure 500 {object} dto.InternalErrorResponse
+// @Router /api/booking/user/{userId} [get]
 func (c *Booking) GetByUserID(ctx *gin.Context) {
 	userID, err := uuid.Parse(ctx.Param("userId"))
 	if err != nil {

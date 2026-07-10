@@ -39,3 +39,12 @@ func (s *UserService) UpdateUser(user *domain.User) error {
 func (s *UserService) DeleteUser(id uuid.UUID) error {
 	return s.userRepo.Delete(id)
 }
+
+func (s *UserService) UploadPhoto(userID uuid.UUID, photoPath string) error {
+	user, err := s.userRepo.GetByID(userID)
+	if err != nil {
+		return err
+	}
+	user.Photo = photoPath
+	return s.userRepo.Update(user)
+}

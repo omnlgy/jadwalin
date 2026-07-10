@@ -1,30 +1,75 @@
 basePath: /
 definitions:
-  github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse:
+  dto.AssignSkillRequest:
+    properties:
+      treatment_id:
+        example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        type: string
+      user_id:
+        example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        type: string
+    required:
+    - treatment_id
+    - user_id
+    type: object
+  dto.BadRequestResponse:
     properties:
       code:
         example: 400
         type: integer
       errors:
         items:
-          $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.FieldError'
+          $ref: '#/definitions/dto.FieldError'
         type: array
       message:
         example: bad request
         type: string
     type: object
-  github_com_omnlgy_jadwalin_internal_dto.CreatedResponse:
+  dto.CreateBookingRequest:
+    properties:
+      staff_id:
+        type: string
+      start_time:
+        type: string
+      treatment_id:
+        type: string
+    required:
+    - staff_id
+    - start_time
+    - treatment_id
+    type: object
+  dto.CreateTreatmentRequest:
+    properties:
+      description:
+        example: Standard haircut
+        type: string
+      duration:
+        example: 30
+        minimum: 1
+        type: integer
+      name:
+        example: Haircut
+        type: string
+      price:
+        example: 50
+        minimum: 0
+        type: number
+    required:
+    - duration
+    - name
+    - price
+    type: object
+  dto.CreatedResponse:
     properties:
       code:
         example: 201
         type: integer
-      data:
-        $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.User'
+      data: {}
       message:
         example: User created successfully
         type: string
     type: object
-  github_com_omnlgy_jadwalin_internal_dto.FieldError:
+  dto.FieldError:
     properties:
       field:
         example: phone_number
@@ -33,7 +78,32 @@ definitions:
         example: invalid phone number
         type: string
     type: object
-  github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse:
+  dto.ForbiddenResponse:
+    properties:
+      code:
+        example: 403
+        type: integer
+      message:
+        example: forbidden
+        type: string
+    type: object
+  dto.GetAvailabelSlotRequest:
+    properties:
+      date:
+        example: "2025-10-15"
+        type: string
+      staff_id:
+        example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        type: string
+      treatment_id:
+        example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        type: string
+    required:
+    - date
+    - staff_id
+    - treatment_id
+    type: object
+  dto.InternalErrorResponse:
     properties:
       code:
         example: 500
@@ -42,7 +112,7 @@ definitions:
         example: Internal server error
         type: string
     type: object
-  github_com_omnlgy_jadwalin_internal_dto.LoginRequest:
+  dto.LoginRequest:
     properties:
       phone:
         example: +628****7890
@@ -50,7 +120,7 @@ definitions:
     required:
     - phone
     type: object
-  github_com_omnlgy_jadwalin_internal_dto.Meta:
+  dto.Meta:
     properties:
       limit:
         example: 10
@@ -65,7 +135,7 @@ definitions:
         example: 5
         type: integer
     type: object
-  github_com_omnlgy_jadwalin_internal_dto.PaginatedResponse:
+  dto.PaginatedResponse:
     properties:
       code:
         example: 200
@@ -75,9 +145,9 @@ definitions:
         example: success
         type: string
       meta:
-        $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.Meta'
+        $ref: '#/definitions/dto.Meta'
     type: object
-  github_com_omnlgy_jadwalin_internal_dto.RegisterOTPRequest:
+  dto.RegisterOTPRequest:
     properties:
       phone:
         example: +628****7890
@@ -89,7 +159,7 @@ definitions:
     - phone
     - user_id
     type: object
-  github_com_omnlgy_jadwalin_internal_dto.RegisterUserRequest:
+  dto.RegisterUserRequest:
     properties:
       address:
         example: Jl. Merdeka No. 1
@@ -101,7 +171,7 @@ definitions:
         example: John Doe
         type: string
       phone_number:
-        example: "+6281234567890"
+        example: +628****7890
         type: string
       photo:
         example: http://example.com/photo.jpg
@@ -112,7 +182,7 @@ definitions:
     - full_name
     - phone_number
     type: object
-  github_com_omnlgy_jadwalin_internal_dto.SuccessResponse:
+  dto.SuccessResponse:
     properties:
       code:
         example: 200
@@ -122,7 +192,24 @@ definitions:
         example: OTP sent successfully
         type: string
     type: object
-  github_com_omnlgy_jadwalin_internal_dto.UpdateUserRequest:
+  dto.UpdateTreatmentRequest:
+    properties:
+      description:
+        example: Standard haircut
+        type: string
+      duration:
+        example: 30
+        minimum: 1
+        type: integer
+      name:
+        example: Haircut
+        type: string
+      price:
+        example: 50
+        minimum: 0
+        type: number
+    type: object
+  dto.UpdateUserRequest:
     properties:
       address:
         example: Jl. Merdeka No. 1
@@ -140,40 +227,13 @@ definitions:
         example: http://example.com/photo.jpg
         type: string
     type: object
-  github_com_omnlgy_jadwalin_internal_dto.User:
-    properties:
-      address:
-        example: Jl. Merdeka No. 1
-        type: string
-      email:
-        example: john.doe@example.com
-        type: string
-      full_name:
-        example: John Doe
-        type: string
-      id:
-        example: a1b2c3d4-e5f6-7890-1234-567890abcdef
-        type: string
-      phone_number:
-        example: +628****7890
-        type: string
-      photo:
-        example: http://example.com/photo.jpg
-        type: string
-      role:
-        example: staff
-        type: string
-      verified:
-        example: true
-        type: boolean
-    type: object
-  github_com_omnlgy_jadwalin_internal_dto.VerifyUserRequest:
+  dto.VerifyUserRequest:
     properties:
       otp:
         example: "123456"
         type: string
       phone:
-        example: "+6281234567890"
+        example: +628****7890
         type: string
     required:
     - otp
@@ -204,22 +264,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.LoginRequest'
+          $ref: '#/definitions/dto.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse'
+            $ref: '#/definitions/dto.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse'
+            $ref: '#/definitions/dto.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse'
+            $ref: '#/definitions/dto.InternalErrorResponse'
       summary: Login — request OTP
       tags:
       - Auth
@@ -234,22 +294,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.VerifyUserRequest'
+          $ref: '#/definitions/dto.VerifyUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse'
+            $ref: '#/definitions/dto.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse'
+            $ref: '#/definitions/dto.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse'
+            $ref: '#/definitions/dto.InternalErrorResponse'
       summary: Login — verify OTP
       tags:
       - Auth
@@ -264,25 +324,481 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.RegisterOTPRequest'
+          $ref: '#/definitions/dto.RegisterOTPRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse'
+            $ref: '#/definitions/dto.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse'
+            $ref: '#/definitions/dto.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse'
+            $ref: '#/definitions/dto.InternalErrorResponse'
       summary: Register OTP for a user
       tags:
       - Auth
+  /api/booking:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new booking (authenticated user)
+      parameters:
+      - description: Create Booking Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateBookingRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CreatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new booking
+      tags:
+      - Booking
+  /api/booking/available-slots:
+    post:
+      consumes:
+      - application/json
+      description: Returns all available time slots for a given treatment, staff,
+        and date
+      parameters:
+      - description: Get Available Slots Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GetAvailabelSlotRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: Get available time slots for a treatment + staff + date
+      tags:
+      - Booking
+  /api/booking/user/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Returns all bookings for a given user (must match authenticated
+        user)
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ForbiddenResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get bookings by user ID
+      tags:
+      - Booking
+  /api/staff-skills:
+    post:
+      consumes:
+      - application/json
+      description: Assigns a treatment to a staff member (admin only)
+      parameters:
+      - description: Assign Skill Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AssignSkillRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CreatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Assign a treatment skill to a staff
+      tags:
+      - StaffSkill
+  /api/staff-skills/{id}:
+    delete:
+      description: Unassigns a treatment from a staff member (admin only)
+      parameters:
+      - description: StaffSkill ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Remove a skill from a staff
+      tags:
+      - StaffSkill
+    get:
+      description: Returns a single staff-skill assignment with joined user and treatment
+      parameters:
+      - description: StaffSkill ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: Get a staff skill by ID
+      tags:
+      - StaffSkill
+  /api/staff-skills/list:
+    get:
+      consumes:
+      - application/json
+      description: Returns a paginated list of all staff-skill assignments, with optional
+        search by staff name
+      parameters:
+      - description: Page number (default 1)
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: Items per page (default 10, max 100)
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - description: Search keyword (matches staff name or phone)
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PaginatedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: List all staff-skill assignments with pagination
+      tags:
+      - StaffSkill
+  /api/staff-skills/staff/{userId}:
+    get:
+      description: Returns all treatments a staff member can perform
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: List skills for a staff member
+      tags:
+      - StaffSkill
+  /api/staff-skills/treatment/{treatmentId}:
+    get:
+      description: Returns all staff members skilled at a given treatment
+      parameters:
+      - description: Treatment ID
+        in: path
+        name: treatmentId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: List staff who can perform a treatment
+      tags:
+      - StaffSkill
+  /api/treatment:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new treatment (admin only)
+      parameters:
+      - description: Create Treatment Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateTreatmentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CreatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new treatment
+      tags:
+      - Treatment
+  /api/treatment/{id}:
+    delete:
+      description: Deletes a treatment by ID (soft delete)
+      parameters:
+      - description: Treatment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a treatment
+      tags:
+      - Treatment
+    get:
+      description: Returns a single treatment
+      parameters:
+      - description: Treatment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: Get a treatment by ID
+      tags:
+      - Treatment
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing treatment
+      parameters:
+      - description: Treatment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Treatment Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateTreatmentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a treatment
+      tags:
+      - Treatment
+  /api/treatment/list:
+    get:
+      consumes:
+      - application/json
+      description: Returns a paginated list of treatments with optional search
+      parameters:
+      - description: Page number (default 1)
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: Items per page (default 10, max 100)
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - description: Search keyword (matches name)
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PaginatedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      summary: List treatments with pagination
+      tags:
+      - Treatment
   /api/user/{id}:
     delete:
       description: Deletes a user by ID (soft delete).
@@ -296,19 +812,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse'
+            $ref: '#/definitions/dto.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse'
+            $ref: '#/definitions/dto.BadRequestResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse'
+            $ref: '#/definitions/dto.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse'
+            $ref: '#/definitions/dto.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Delete a user
@@ -330,29 +846,69 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.UpdateUserRequest'
+          $ref: '#/definitions/dto.UpdateUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse'
+            $ref: '#/definitions/dto.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse'
+            $ref: '#/definitions/dto.BadRequestResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse'
+            $ref: '#/definitions/dto.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse'
+            $ref: '#/definitions/dto.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Update a user
+      tags:
+      - User
+  /api/user/{id}/photo:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads a photo for a specific user.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User photo file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Upload a user photo
       tags:
       - User
   /api/user/list:
@@ -391,11 +947,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.PaginatedResponse'
+            $ref: '#/definitions/dto.PaginatedResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse'
+            $ref: '#/definitions/dto.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: List users with pagination
@@ -412,22 +968,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.RegisterUserRequest'
+          $ref: '#/definitions/dto.RegisterUserRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.CreatedResponse'
+            $ref: '#/definitions/dto.CreatedResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.BadRequestResponse'
+            $ref: '#/definitions/dto.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse'
+            $ref: '#/definitions/dto.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Register a new staff
@@ -445,22 +1001,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.VerifyUserRequest'
+          $ref: '#/definitions/dto.VerifyUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.SuccessResponse'
+            $ref: '#/definitions/dto.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse'
+            $ref: '#/definitions/dto.InternalErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_omnlgy_jadwalin_internal_dto.InternalErrorResponse'
+            $ref: '#/definitions/dto.InternalErrorResponse'
       summary: Verify user with OTP
       tags:
       - User

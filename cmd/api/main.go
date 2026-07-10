@@ -100,6 +100,9 @@ func main() {
 	server.Use(gin.Logger())
 	server.Use(gin.Recovery())
 
+	// Serve static files
+	server.Static("/uploads", "./public/uploads")
+
 	router.AuthRoutes(server, *authController)
 	router.UserRoutes(server, *userController)
 	router.TreatmentRoutes(server, *treatmentController)

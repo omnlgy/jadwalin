@@ -3,7 +3,10 @@ package controller
 import (
 	"errors"
 	"math"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -318,5 +321,81 @@ func (c *User) DeleteUser(ctx *gin.Context) {
 	ctx.JSON(200, dto.SuccessResponse{
 		Code:    200,
 		Message: "user deleted",
+	})
+}
+
+// UploadPhoto godoc
+// @Summary Upload a user photo
+// @Description Uploads a photo for a specific user.
+// @Tags User
+// @Accept multipart/form-data
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "User ID"
+// @Param file formData file true "User photo file"
+// @Success 200 {object} dto.SuccessResponse
+// @Failure 400 {object} dto.BadRequestResponse
+// @Failure 404 {object} dto.BadRequestResponse
+// @Failure 500 {object} dto.InternalErrorResponse
+// @Router /api/user/{id}/photo [post]
+func (c *User) UploadPhoto(ctx *gin.Context) {
+	userID, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.AbortWithStatusJSON(400, dto.BadRequestResponse{
+			Code:    400,
+			Message: "invalid user ID",
+		})
+		return
+	}
+
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		ctx.AbortWithStatusJSON(400, dto.BadRequestResponse{
+			Code:    400,
+			Message: "missing file",
+		})
+		return
+	}
+
+	// Create the uploads directory if it doesn't exist
+	uploadDir := "./public/uploads/photos"
+	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
+		os.MkdirAll(uploadDir, os.ModePerm)
+	}
+
+	// Generate a unique filename
+	ext := filepath.Ext(file.Filename)
+	newFileName := strings.Replace(uuid.New().String(), "-", "", -1) + ext
+	destination := filepath.Join(uploadDir, newFileName)
+
+	// Save the file
+	if err := ctx.SaveUploadedFile(file, destination); err != nil {
+		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
+			Code:    500,
+			Message: "failed to save file",
+		})
+		return
+	}
+
+	// Update user's photo path in the database
+	if err := c.userService.UploadPhoto(userID, "/uploads/photos/" + newFileName); err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			ctx.AbortWithStatusJSON(404, dto.BadRequestResponse{
+				Code:    404,
+				Message: "user not found",
+			})
+			return
+		}
+		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
+			Code:    500,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(200, dto.SuccessResponse{
+		Code:    200,
+		Message: "photo uploaded successfully",
+		Data: gin.H{"photo_url": "/uploads/photos/" + newFileName},
 	})
 }

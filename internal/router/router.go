@@ -42,6 +42,7 @@ func UserRoutes(router *gin.Engine, controller controller.User) {
 	user.GET("/list", controller.ListUsers)
 	user.PUT("/:id", middleware.AuthMiddleware(), controller.UpdateUser)
 	user.DELETE("/:id", middleware.AuthMiddleware(), middleware.RequireRole("admin"), controller.DeleteUser)
+	user.POST("/:id/photo", middleware.AuthMiddleware(), controller.UploadPhoto)
 }
 
 func BookingRoutes(router *gin.Engine, ctrl controller.Booking) {

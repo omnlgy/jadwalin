@@ -20,7 +20,11 @@ func NewNotificationService(waProvider domain.WhatsAppProvider, emailProvider do
 }
 
 func (s *NotificationService) SendOTPLoginWhatsApp(ctx context.Context, to, otpCode string) error {
-	message := fmt.Sprintf("Your OTP is: %s", otpCode)
+	message := fmt.Sprintf(
+		"⏰ Login Request\nYour OTP is: %s\n\n⌛ This code expires in %d minutes.\nIf you did not request this, please ignore this message.",
+		otpCode,
+		5,
+	)
 	return s.waProvider.SendMessage(ctx, to, message)
 }
 
@@ -45,7 +49,7 @@ func (s *NotificationService) SendEmailInVoice(ctx context.Context, booking *dom
 <tr><td>Nama Treatment</td><td>%s</td></tr>
 <tr><td>Jadwal Booking</td><td>%s</td></tr>
 <tr><td>Staff Penangan</td><td>%s</td></tr>
-<tr><td>Total Harga</td><td>Rp %d</td></tr>
+<tr><td>Total Harga</td><td>Rp %.0f</td></tr>
 </table>
 <p>Terima kasih,<br><strong>Jadwalin</strong></p>
 </body>
