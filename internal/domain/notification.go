@@ -12,5 +12,6 @@ type EmailProvider interface {
 
 type NotificationService interface {
 	SendOTPLoginWhatsApp(ctx context.Context, to, otpCode string) error
-	// SendEmail(ctx context.Context, to, subject, body string) error
+	SendEmail(ctx context.Context, to, subject, body string) error
+	SendEmailInVoice(ctx context.Context, booking *Booking) error
 }

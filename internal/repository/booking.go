@@ -30,18 +30,32 @@ func (r *Booking) Create(booking *domain.Booking) (*domain.Booking, error) {
 	if err := r.db.Create(m).Error; err != nil {
 		return nil, fmt.Errorf("repo: create booking: %w", err)
 	}
-	return toDomainBooking(m), nil
+	created, err := r.GetByID(m.ID)
+	if err != nil {
+		return nil, fmt.Errorf("repo: create booking: failed to reload: %w", err)
+	}
+	return created, nil
 }
 
 func (r *Booking) GetByID(id uuid.UUID) (*domain.Booking, error) {
 	var m models.Booking
-	err := r.db.Preload("Client").Preload("Staff").Preload("Treatment").First(&m, id).Error
+	err := r.db.First(&m, id).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, fmt.Errorf("repo: get booking %s: %w", id, domain.ErrNotFound)
 		}
 		return nil, fmt.Errorf("repo: get booking %s: %w", id, err)
 	}
+	// Load associations manually to avoid GORM dual-FK-to-same-table bug
+	var client models.User
+	r.db.Unscoped().First(&client, m.ClientID)
+	m.Client = client
+	var staff models.User
+	r.db.Unscoped().First(&staff, m.StaffID)
+	m.Staff = staff
+	var treatment models.Treatment
+	r.db.First(&treatment, m.TreatmentID)
+	m.Treatment = treatment
 	return toDomainBooking(&m), nil
 }
 

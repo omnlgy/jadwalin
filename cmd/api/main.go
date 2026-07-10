@@ -79,11 +79,12 @@ func main() {
 
 	// Initialize notification provider
 	waProvider := provider.NewWhatsAppProvider(cfg.GOWA_URL, cfg.GOWA_DEVICE_ID)
+	emailProvider := provider.NewEmailProvider(cfg.SMTP_HOST, cfg.SMTP_PORT, cfg.SMTP_USER, cfg.SMTP_PASS, cfg.SMTP_SENDER)
 
 	// Initialize services
 	userService := service.NewUserService(userRepo)
 	authService := service.NewAuthService(authRepo)
-	notificationService := service.NewNotificationService(waProvider, nil)
+	notificationService := service.NewNotificationService(waProvider, emailProvider)
 	treatmentService := service.NewTreatmentService(treatmentRepo)
 	staffSkillService := service.NewStaffSkillService(staffSkillRepo)
 	bookingService := service.NewBookingService(bookingRepo, userRepo, treatmentRepo, staffSkillRepo)
@@ -93,7 +94,7 @@ func main() {
 	userController := controller.NewUserController(userService, authService, notificationService)
 	treatmentController := controller.NewTreatmentController(treatmentService)
 	staffSkillController := controller.NewStaffSkillController(staffSkillService)
-	bookingController := controller.NewBookingController(bookingService, treatmentService)
+	bookingController := controller.NewBookingController(bookingService, treatmentService, notificationService)
 
 	server := gin.New()
 	server.Use(gin.Logger())

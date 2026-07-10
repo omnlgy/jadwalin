@@ -120,7 +120,7 @@ func (r *StaffSkill) GetByStaffAndTreatment(staffID, treatmentID uuid.UUID) (*do
 	err := r.db.Where("user_id = ? AND treatment_id = ?", staffID, treatmentID).First(&m).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("repo: staff skill not found for staff %s and treatment %s", staffID, treatmentID)
+			return nil, fmt.Errorf("repo: staff skill not found for staff %s and treatment %s: %w", staffID, treatmentID, domain.ErrNotFound)
 		}
 		return nil, fmt.Errorf("repo: get staff skill %s: %w", staffID, err)
 	}

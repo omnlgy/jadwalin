@@ -47,7 +47,7 @@ func Load() *Config {
 		REDIS_PASS:     getEnv("REDIS_PASSWORD", ""),
 		SMTP_HOST:      getEnv("SMTP_HOST", ""),
 		SMTP_PORT:      getEnv("SMTP_PORT", ""),
-		SMTP_USER:      getEnv("SMTP_USER", ""),
+		SMTP_USER:      getEnv("SMTP_USERNAME", ""),
 		SMTP_PASS:      getEnv("SMTP_PASSWORD", ""),
 		SMTP_SENDER:    getEnv("SMTP_SENDER", ""),
 		JWT_SECRET:     getEnv("JWT_SECRET", "your-secret-key"),

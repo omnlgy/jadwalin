@@ -178,40 +178,54 @@ Access rules:
 
 ## Booking Module
 
-JWT token generated with HS256 using app secret (env `APP_SECRET`).
+Test run: 2026-07-10
+App running at `http://localhost:8080`
+JWT tokens generated using HS256 with app secret.
 
 Seeded data:
-- Jane Smith (staff, has skills: Massage, Haircut Premium, Facial Treatment)
-- Massage treatment: 60 min duration, $100
-- Pre-existing booking for Jane on Jul 15 at 10:00, and Jul 10 at 12:04
+- John Doe (admin, id: `019f4a13-e16a-7a10-8024-b70688e7228e`)
+- Jane Smith (staff, id: `019f4a13-e171-7d31-91c5-930962c2dc73`, skilled in: Haircut, Massage, Manicure)
+- Peter Jones (user, id: `019f4a13-e178-76f8-b5f1-96b436f1edef`)
+- Treatments: Haircut (30min/50), Massage (60min/100), Manicure (45min/30)
+- Existing bookings: Peter → Jane, Haircut (confirmed, tomorrow+1d), Massage (pending, tomorrow+2d)
 
 Access rules:
 - `POST /api/booking/available-slots` → public
 - `POST /api/booking/` → `AuthMiddleware()` only (any authenticated user)
+- `GET /api/booking/user/:userId` → `AuthMiddleware()` only (must match own userId)
+- `GET /api/booking/:id` → `AuthMiddleware()` only (no handler wired — returns 404)
 
 ### Positive Cases
 
 | # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
 |---|--------|----------|----------------|-------------|----------|--------|--------|
-| 1 | POST | `/api/booking/available-slots` | `{treatment_id, staff_id, date:"2026-07-16"}` | Get available slots for a date with no prior bookings | `code:200, 8 slots (09:00-17:00, 60min each)` | `code:200, 8 slots` | ✅ |
-| 2 | POST | `/api/booking/available-slots` | `{treatment_id, staff_id, date:"2026-07-15"}` | Get available slots for a date with bookings at 10:00 | `code:200, 7 slots (10:00 excluded)` | `code:200, 7 slots` | ✅ |
-| 3 | POST | `/api/booking/` | `{treatment_id, staff_id, start_time}` + valid JWT | Create a booking at 10:00 on Jul 16 | `code:201, booking with pending status` | `code:201, booking created` | ✅ |
-| 4 | POST | `/api/booking/available-slots` | same as #1 after booking at 10:00 | Verify the 10:00 slot is no longer available | `code:200, 7 slots (10:00 excluded)` | `code:200, 7 slots` | ✅ |
+| 1 | POST | `/api/booking/available-slots` | `{treatment_id: Haircut, staff_id: Jane, date:"2026-07-11"}` | Get available slots for Haircut+Jane (tomorrow) | `code:200, slots` | `code:200, 16 slots (30min each, 09:00-17:00)` | ✅ |
+| 5 | POST | `/api/booking/` | `{treatment_id: Massage, staff_id: Jane, start_time:"2026-07-11T10:00:00Z"}` + Peter's JWT | Create booking for Massage with Jane (Peter auth) | `code:201, status:"pending"` | `code:201, end_time=11:00` | ✅ |
+| 9 | GET | `/api/booking/user/:userId` | Peter's userId + Peter's JWT | Get Peter's own bookings (2 seed + 1 new) | `code:200, 3 bookings` | `code:200, 3 bookings` | ✅ |
+| 12 | POST | `/api/booking/available-slots` | `{treatment_id: Manicure, staff_id: Jane, date:"2026-07-11"}` | Available slots (Jane skilled in Manicure) | `code:200, 9 slots (45min each)` | `code:200, 9 slots` | ✅ |
 
 ### Negative Cases
 
 | # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
 |---|--------|----------|----------------|-------------|----------|--------|--------|
-| 5 | POST | `/api/booking/` | same slot as #3 (duplicate) + valid JWT | Try duplicate booking at same time | `code:409, "slot not available"` | `code:409, "service: slot not available: record already exists"` | ✅ |
-| 6 | POST | `/api/booking/` | `{...}` no auth header | Create booking without authentication | `code:401` | `code:401, "missing authorization header"` | ✅ |
-| 7 | POST | `/api/booking/` | `{treatment_id for Facial, staff_id for Jane}` + valid JWT | Jane tries to book a treatment she doesn't have skill for | `code:400 or 409, "staff not skilled"` | `code:400, "treatment not found"` | 🔶 |
+| 2 | POST | `/api/booking/available-slots` | `{treatment_id: "not-a-uuid", staff_id: Jane, date:"2026-07-11"}` | Invalid treatment_id format | `code:400, validation error` | `code:400, "uuid"` | ✅ |
+| 3 | POST | `/api/booking/available-slots` | `{treatment_id: Haircut, staff_id: Jane, date:"bad-date"}` | Invalid date format | `code:400, validation error` | `code:400, "datetime"` | ✅ |
+| 4 | POST | `/api/booking/available-slots` | `{treatment_id: "0000...0000", staff_id: Jane, date:"2026-07-11"}` | Non-existent treatment UUID | `code:400, "treatment not found"` | `code:400, "treatment not found"` | ✅ |
+| 6 | POST | `/api/booking/` | `{treatment_id: Haircut, staff_id: Jane, start_time:"2026-07-11T10:00:00Z"}` no auth | Create booking without auth → unauthorized | `code:401` | `code:401, "missing authorization header"` | ✅ |
+| 7 | POST | `/api/booking/` | `{treatment_id: Massage, staff_id: Jane, start_time:"2026-07-11T10:00:00Z"}` + Peter's JWT | Duplicate booking same slot → conflict | `code:409, "slot not available"` | `code:409, "slot not available"` | ✅ |
+| 8 | POST | `/api/booking/` | `{treatment_id: "0000...0000", staff_id: Jane, start_time:"2026-07-11T10:00:00Z"}` + Peter's JWT | Non-existent treatment → not found | `code:404, "treatment not found"` | `code:404, "treatment not found"` | ✅ |
+| 10 | GET | `/api/booking/user/:userId` | Admin's userId + Peter's JWT | Get someone else's bookings → forbidden | `code:403` | `code:403, "forbidden"` | ✅ |
+| 11 | GET | `/api/booking/user/bad-uuid` | Invalid UUID + Peter's JWT | Invalid user ID format → bad request | `code:400, "invalid user_id"` | `code:400, "invalid user_id"` | ✅ |
+| 13 | POST | `/api/booking/available-slots` | `{treatment_id: Haircut, staff_id: John (admin), date:"2026-07-11"}` | Staff (admin John) not skilled — returns slots anyway (no skill check at this endpoint) | `code:200, 16 slots` | `code:200, 16 slots` | ✅ |
 
 ### Notes
-- `available-slots` endpoint calculates slots based on treatment duration (60 min = 1hr slots)
-- Store hours hardcoded 09:00-17:00
-- Conflict detection uses strict time overlap (`StartTime < b.EndTime && EndTime > b.StartTime`)
+- `available-slots` calculates slots based on treatment duration (Haircut=30min, Massage=60min, Manicure=45min)
+- Store hours hardcoded 09:00-17:00 UTC
+- Conflict detection uses strict overlap (`StartTime < b.EndTime && EndTime > b.StartTime`)
 - Bookings with `cancelled` status are excluded from conflict checks
-- Test #7 returned 400 because the Facial treatment ID was unreachable (deleted during Treatment CRUD testing) — slot availability check runs first and rejects the unknown treatment
+- Past-time slots are filtered out — slots before `time.Now()` are skipped
+- `available-slots` does NOT check whether the staff is skilled for the requested treatment (only checks treatment duration)
+- Skill check is done in the `Create` service layer only — returns 409 if staff lacks skill
 
 ---
 
@@ -222,5 +236,5 @@ Access rules:
 | User / Auth | 39 | 39 | 0 |
 | Treatment CRUD | 21 | 21 | 0 |
 | StaffSkill CRUD | 21 | 21 | 0 |
-| Booking | 7 | 6 | 0 |
-| **Total** | **88** | **87** | **0** |
+| Booking | 13 | 13 | 0 |
+| **Total** | **94** | **94** | **0** |

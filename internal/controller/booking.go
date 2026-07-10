@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,14 +12,16 @@ import (
 )
 
 type Booking struct {
-	bookingService   domain.BookingService
-	treatmentService domain.TreatmentService
+	bookingService      domain.BookingService
+	treatmentService    domain.TreatmentService
+	notificationService domain.NotificationService
 }
 
-func NewBookingController(bookingService domain.BookingService, treatmentService domain.TreatmentService) *Booking {
+func NewBookingController(bookingService domain.BookingService, treatmentService domain.TreatmentService, notificationService domain.NotificationService) *Booking {
 	return &Booking{
-		bookingService:   bookingService,
-		treatmentService: treatmentService,
+		bookingService:      bookingService,
+		treatmentService:    treatmentService,
+		notificationService: notificationService,
 	}
 }
 
@@ -69,6 +72,13 @@ func (c *Booking) GetAvailableSlots(ctx *gin.Context) {
 
 	slots, err := c.bookingService.GetAvailableSlots(treatmentID, staffID, date)
 	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			ctx.AbortWithStatusJSON(400, dto.BadRequestResponse{
+				Code:    400,
+				Message: "treatment not found",
+			})
+			return
+		}
 		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
 			Code:    500,
 			Message: err.Error(),
@@ -190,6 +200,14 @@ func (c *Booking) CreateBooking(ctx *gin.Context) {
 		return
 	}
 
+	// Send email notification
+	go func() {
+		if err := c.notificationService.SendEmailInVoice(ctx.Request.Context(), result); err != nil {
+			// Log error but don't fail the booking creation
+			fmt.Printf("Failed to send email notification: %v\n", err)
+		}
+	}()
+
 	ctx.JSON(201, dto.CreatedResponse{
 		Code:    201,
 		Message: "booking created",
@@ -202,5 +220,40 @@ func (c *Booking) CreateBooking(ctx *gin.Context) {
 			EndTime:     result.EndTime.Format(time.RFC3339),
 			Status:      result.Status,
 		},
+	})
+}
+
+func (c *Booking) GetByUserID(ctx *gin.Context) {
+	userID, err := uuid.Parse(ctx.Param("userId"))
+	if err != nil {
+		ctx.AbortWithStatusJSON(400, dto.BadRequestResponse{
+			Code:    400,
+			Message: "invalid user_id",
+		})
+		return
+	}
+
+	userIDStr := ctx.GetString("userId")
+	if userIDStr != userID.String() {
+		ctx.AbortWithStatusJSON(403, dto.ForbiddenResponse{
+			Code:    403,
+			Message: "forbidden",
+		})
+		return
+	}
+
+	bookings, err := c.bookingService.GetByUserID(userID)
+	if err != nil {
+		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
+			Code:    500,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(200, dto.SuccessResponse{
+		Code:    200,
+		Message: "bookings retrieved",
+		Data:    bookings,
 	})
 }

@@ -25,12 +25,9 @@ func (p *WhatsAppProvider) SendMessage(ctx context.Context, to, message string) 
 	formatedPhone, _ := strings.CutPrefix(to, "+")
 
 	payload := map[string]interface{}{
-		"phone":            formatedPhone + "@s.whatsapp.net",
-		"message":          message,
-		"reply_message_id": "",
-		"is_forwarded":     false,
-		"duration":         0,
-		"mentions":         []interface{}{},
+		"phone":        formatedPhone + "@s.whatsapp.net",
+		"message":      message,
+		"is_forwarded": false,
 	}
 
 	jsonData, err := json.Marshal(payload)

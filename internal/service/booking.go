@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -27,6 +28,9 @@ func NewBookingService(bookingRepo domain.BookingRepository, userRepo domain.Use
 func (s *BookingService) Create(booking *domain.Booking) (*domain.Booking, error) {
 	staffSkill, err := s.staffSkillRepo.GetByStaffAndTreatment(booking.StaffID, booking.TreatmentID)
 	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return nil, fmt.Errorf("service: staff is not skilled for this treatment: %w", domain.ErrConflict)
+		}
 		return nil, fmt.Errorf("service: check staff skill: %w", err)
 	}
 	if staffSkill == nil {

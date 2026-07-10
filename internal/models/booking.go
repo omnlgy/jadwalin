@@ -20,9 +20,9 @@ type Booking struct {
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
 
 	// Associations
-	Client    User      `gorm:"foreignKey:ClientID"`
-	Staff     User      `gorm:"foreignKey:StaffID"`
-	Treatment Treatment `gorm:"foreignKey:TreatmentID"`
+	Client    User      `gorm:"foreignKey:ClientID;references:ID"`
+	Staff     User      `gorm:"foreignKey:StaffID;references:ID"`
+	Treatment Treatment `gorm:"foreignKey:TreatmentID;references:ID"`
 }
 
 // BeforeCreate will set a UUIDV7 for the ID field
