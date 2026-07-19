@@ -220,3 +220,21 @@ func (c *Auth) LoginVerify(ctx *gin.Context) {
 		},
 	})
 }
+
+func (c *Auth) Logout(ctx *gin.Context) {
+	token := ctx.GetString("token")
+
+	err := c.authService.Logout(ctx.Request.Context(), token)
+	if err != nil {
+		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
+			Code:    500,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(200, dto.SuccessResponse{
+		Code:    200,
+		Message: "logout successful",
+	})
+}

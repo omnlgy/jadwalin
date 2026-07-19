@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/omnlgy/jadwalin/internal/domain"
+	"github.com/omnlgy/jadwalin/utils"
 )
 
 type AuthService struct {
@@ -41,9 +42,19 @@ func (s *AuthService) VerifyOTP(ctx context.Context, key, code string) error {
 	return nil
 }
 
-func (s *AuthService) Login(ctx context.Context, phone string) (string, error) {
-	// TODO: implement login logic
-	return "", nil
+func (s *AuthService) Logout(ctx context.Context, token string) error {
+	claim, err := utils.ValidateJWT(token)
+	if err != nil {
+		return err
+	}
+
+	key := fmt.Sprintf("blacklist:%s", token)
+	err = s.authRepo.Create(ctx, key, "", time.Until(claim.ExpiresAt.Time))
+
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func generateCode() string {

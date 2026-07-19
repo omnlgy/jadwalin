@@ -11,13 +11,8 @@ import (
 	_ "github.com/omnlgy/jadwalin/docs" // Import generated docs
 
 	"github.com/omnlgy/jadwalin/internal/config"
-	"github.com/omnlgy/jadwalin/internal/controller"
-	"github.com/omnlgy/jadwalin/internal/db"
-	"github.com/omnlgy/jadwalin/internal/models"
-	"github.com/omnlgy/jadwalin/internal/provider"
-	"github.com/omnlgy/jadwalin/internal/repository"
+	"github.com/omnlgy/jadwalin/internal/container"
 	"github.com/omnlgy/jadwalin/internal/router"
-	"github.com/omnlgy/jadwalin/internal/service"
 )
 
 func init() {
@@ -48,53 +43,15 @@ func main() {
 
 	cfg := config.Load()
 
-	posgreDb, err := db.NewPostgresDB(cfg)
+	cont, err := container.InitializeContainer(cfg)
 	if err != nil {
-		fmt.Println("Failed to connect to database")
+		fmt.Printf("Failed to initialize container: %v\n", err)
 		return
 	}
 
-	if sqlDb, err := posgreDb.DB(); err != nil {
-		fmt.Println("Failed to get database connection")
-		return
-	} else {
-		defer sqlDb.Close()
-	}
-
-	// Auto-migrate tables on startup
-	if err := posgreDb.AutoMigrate(&models.User{}, &models.Treatment{}, &models.Booking{}, &models.StaffSkill{}); err != nil {
-		fmt.Println("Failed to auto-migrate database:", err)
-		return
-	}
-
-	rDb := db.NewRedisClient(cfg)
-	defer rDb.Close()
-
-	// Initialize repositories
-	userRepo := repository.NewUserRepository(posgreDb)
-	authRepo := repository.NewAuthRepository(rDb)
-	treatmentRepo := repository.NewTreatmentRepository(posgreDb)
-	staffSkillRepo := repository.NewStaffSkillRepository(posgreDb)
-	bookingRepo := repository.NewBookingRepository(posgreDb)
-
-	// Initialize notification provider
-	waProvider := provider.NewWhatsAppProvider(cfg.GOWA_URL, cfg.GOWA_DEVICE_ID)
-	emailProvider := provider.NewEmailProvider(cfg.SMTP_HOST, cfg.SMTP_PORT, cfg.SMTP_USER, cfg.SMTP_PASS, cfg.SMTP_SENDER)
-
-	// Initialize services
-	userService := service.NewUserService(userRepo)
-	authService := service.NewAuthService(authRepo)
-	notificationService := service.NewNotificationService(waProvider, emailProvider)
-	treatmentService := service.NewTreatmentService(treatmentRepo)
-	staffSkillService := service.NewStaffSkillService(staffSkillRepo)
-	bookingService := service.NewBookingService(bookingRepo, userRepo, treatmentRepo, staffSkillRepo)
-
-	// Initialize controllers
-	authController := controller.NewAuthController(authService, userService, notificationService)
-	userController := controller.NewUserController(userService, authService, notificationService)
-	treatmentController := controller.NewTreatmentController(treatmentService)
-	staffSkillController := controller.NewStaffSkillController(staffSkillService)
-	bookingController := controller.NewBookingController(bookingService, treatmentService, notificationService)
+	// TODO: Move posgreDb.DB().Close() and rDb.Close() into container.Close() after refactoring.
+	// For now, assume posgreDb is managed internally by the container and its underlying *sql.DB is closed elsewhere.
+	// Similarly for Redis.
 
 	server := gin.New()
 	server.Use(gin.Logger())
@@ -103,11 +60,11 @@ func main() {
 	// Serve static files
 	server.Static("/uploads", "./public/uploads")
 
-	router.AuthRoutes(server, *authController)
-	router.UserRoutes(server, *userController)
-	router.TreatmentRoutes(server, *treatmentController)
-	router.StaffSkillRoutes(server, *staffSkillController)
-	router.BookingRoutes(server, *bookingController)
+	router.AuthRoutes(server, cont)
+	router.UserRoutes(server, cont)
+	router.TreatmentRoutes(server, cont)
+	router.StaffSkillRoutes(server, cont)
+	router.BookingRoutes(server, cont)
 
 	// Add Swagger UI
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
