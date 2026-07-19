@@ -6,6 +6,7 @@ import (
 	"github.com/omnlgy/jadwalin/internal/config"
 	"github.com/omnlgy/jadwalin/internal/controller"
 	"github.com/omnlgy/jadwalin/internal/db"
+	"github.com/omnlgy/jadwalin/internal/domain"
 	"github.com/omnlgy/jadwalin/internal/models"
 	"github.com/omnlgy/jadwalin/internal/provider"
 	"github.com/omnlgy/jadwalin/internal/repository"
@@ -19,6 +20,7 @@ type Container struct {
 	TreatmentController  *controller.Treatment
 	StaffSkillController *controller.StaffSkill
 	BookingController    *controller.Booking
+	AuthService          domain.AuthService
 }
 
 // InitializeContainer creates and initializes all application components
@@ -67,6 +69,7 @@ func InitializeContainer(cfg *config.Config) (*Container, error) {
 		TreatmentController:  treatmentController,
 		StaffSkillController: staffSkillController,
 		BookingController:    bookingController,
+		AuthService:          authService,
 	}, nil
 }
 

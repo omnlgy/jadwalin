@@ -57,6 +57,15 @@ func (s *AuthService) Logout(ctx context.Context, token string) error {
 	return nil
 }
 
+func (s *AuthService) IsBlacklisted(ctx context.Context, token string) (bool, error) {
+	key := fmt.Sprintf("blacklist:%s", token)
+	_, err := s.authRepo.Get(ctx, key)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 func generateCode() string {
 	return fmt.Sprintf("%06d", rand.IntN(1000000))
 }

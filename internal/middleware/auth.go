@@ -10,7 +10,7 @@ import (
 	"github.com/omnlgy/jadwalin/utils"
 )
 
-func AuthMiddleware() gin.HandlerFunc {
+func AuthMiddleware(authService domain.AuthService) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
 
@@ -27,6 +27,22 @@ func AuthMiddleware() gin.HandlerFunc {
 			ctx.AbortWithStatusJSON(401, dto.UnauthorizedResponse{
 				Code:    401,
 				Message: "invalid authorization format",
+			})
+			return
+		}
+
+		isBlacklisted, err := authService.IsBlacklisted(ctx, tokenString)
+		if err != nil {
+			ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
+				Code:    500,
+				Message: "failed to check token blacklist",
+			})
+			return
+		}
+		if isBlacklisted {
+			ctx.AbortWithStatusJSON(401, dto.UnauthorizedResponse{
+				Code:    401,
+				Message: "token is blacklisted",
 			})
 			return
 		}
