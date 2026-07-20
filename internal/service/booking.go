@@ -55,8 +55,8 @@ func (s *BookingService) GetByID(id uuid.UUID) (*domain.Booking, error) {
 	return s.bookingRepo.GetByID(id)
 }
 
-func (s *BookingService) GetByUserID(userID uuid.UUID) ([]domain.Booking, error) {
-	return s.bookingRepo.GetByUserID(userID)
+func (s *BookingService) GetByUserID(userID uuid.UUID, params domain.BookingQuery) ([]domain.Booking, error) {
+	return s.bookingRepo.GetByUserID(userID, params)
 }
 
 func (s *BookingService) GetByTreatmentID(treatmentID uuid.UUID) ([]domain.Booking, error) {

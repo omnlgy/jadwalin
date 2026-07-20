@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand/v2"
 	"time"
@@ -61,6 +62,9 @@ func (s *AuthService) IsBlacklisted(ctx context.Context, token string) (bool, er
 	key := fmt.Sprintf("blacklist:%s", token)
 	_, err := s.authRepo.Get(ctx, key)
 	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return false, nil
+		}
 		return false, err
 	}
 	return true, nil

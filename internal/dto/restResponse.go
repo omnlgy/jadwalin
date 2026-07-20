@@ -22,13 +22,14 @@ type Treatment struct {
 }
 
 type StaffSkill struct {
-	Id              string  `json:"id"`
-	UserID          string  `json:"user_id"`
-	UserFullName    string  `json:"user_full_name"`
-	UserPhoneNumber string  `json:"user_phone_number"`
-	TreatmentID     string  `json:"treatment_id"`
-	TreatmentName   string  `json:"treatment_name"`
-	TreatmentPrice  float64 `json:"treatment_price"`
+	Id                string  `json:"id"`
+	UserID            string  `json:"user_id"`
+	UserFullName      string  `json:"user_full_name"`
+	UserPhoneNumber   string  `json:"user_phone_number"`
+	TreatmentID       string  `json:"treatment_id"`
+	TreatmentName     string  `json:"treatment_name"`
+	TreatmentPrice    float64 `json:"treatment_price"`
+	TreatmentDuration int     `json:"treatment_duration"`
 }
 
 type FieldError struct {
@@ -109,4 +110,9 @@ type AvailabelSlot struct {
 
 type GetAvailabelSlotResponse struct {
 	AvailableSlots []AvailabelSlot `json:"available_slots"`
+}
+
+type NotFoundResponse struct {
+	Code    int    `json:"code" example:"404"`
+	Message string `json:"message" example:"not found"`
 }

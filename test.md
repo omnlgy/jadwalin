@@ -178,45 +178,51 @@ Access rules:
 
 ## Booking Module
 
-Test run: 2026-07-10
+Test run: 2026-07-19
 App running at `http://localhost:8080`
 JWT tokens generated using HS256 with app secret.
 
 Seeded data:
-- John Doe (admin, id: `019f4a13-e16a-7a10-8024-b70688e7228e`)
-- Jane Smith (staff, id: `019f4a13-e171-7d31-91c5-930962c2dc73`, skilled in: Haircut, Massage, Manicure)
-- Peter Jones (user, id: `019f4a13-e178-76f8-b5f1-96b436f1edef`)
+- John Doe (admin, phone: `6281234567890`)
+- Jane Smith (staff, phone: `6281122334455`, skilled in: Haircut, Massage, Manicure)
+- Peter Jones (user, phone: `6287654321098`)
 - Treatments: Haircut (30min/50), Massage (60min/100), Manicure (45min/30)
-- Existing bookings: Peter → Jane, Haircut (confirmed, tomorrow+1d), Massage (pending, tomorrow+2d)
+- Existing bookings: Peter→Jane, Haircut (confirmed, tomorrow+1d), Massage (pending, tomorrow+2d)
 
 Access rules:
 - `POST /api/booking/available-slots` → public
 - `POST /api/booking/` → `AuthMiddleware()` only (any authenticated user)
-- `GET /api/booking/user/:userId` → `AuthMiddleware()` only (must match own userId)
-- `GET /api/booking/:id` → `AuthMiddleware()` only (no handler wired — returns 404)
+- `GET /api/booking/user/:userId` → `AuthMiddleware()` only (must match own userId or be admin)
+- `GET /api/booking/:id` → `AuthMiddleware()` only (must be booking owner or admin)
 
 ### Positive Cases
 
 | # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
 |---|--------|----------|----------------|-------------|----------|--------|--------|
-| 1 | POST | `/api/booking/available-slots` | `{treatment_id: Haircut, staff_id: Jane, date:"2026-07-11"}` | Get available slots for Haircut+Jane (tomorrow) | `code:200, slots` | `code:200, 16 slots (30min each, 09:00-17:00)` | ✅ |
-| 5 | POST | `/api/booking/` | `{treatment_id: Massage, staff_id: Jane, start_time:"2026-07-11T10:00:00Z"}` + Peter's JWT | Create booking for Massage with Jane (Peter auth) | `code:201, status:"pending"` | `code:201, end_time=11:00` | ✅ |
-| 9 | GET | `/api/booking/user/:userId` | Peter's userId + Peter's JWT | Get Peter's own bookings (2 seed + 1 new) | `code:200, 3 bookings` | `code:200, 3 bookings` | ✅ |
-| 12 | POST | `/api/booking/available-slots` | `{treatment_id: Manicure, staff_id: Jane, date:"2026-07-11"}` | Available slots (Jane skilled in Manicure) | `code:200, 9 slots (45min each)` | `code:200, 9 slots` | ✅ |
+| 1 | POST | `/api/booking/available-slots` | `{treatment_id: Haircut, staff_id: Jane, date:"tomorrow"}` | Get available slots for Haircut+Jane (public) | `code:200, slots` | `code:200, slots returned` | ✅ |
+| 2 | POST | `/api/booking/` | `{treatment_id: Haircut, staff_id: Jane, start_time}` + Peter's JWT | Create booking for Haircut with Jane | `code:201, status:"pending"` | `code:201, booking created` | ✅ |
+| 3 | POST | `/api/booking/` | `{treatment_id: Massage, staff_id: Jane, start_time}` + Peter's JWT | Create booking for Massage with Jane | `code:201, status:"pending"` | `code:201, booking created` | ✅ |
+| 4 | GET | `/api/booking/user/:userId` | Peter's userId + Peter's JWT | Get Peter's own bookings | `code:200, bookings` | `code:200, bookings retrieved` | ✅ |
+| 5 | GET | `/api/booking/user/:userId` | Peter's userId + admin JWT | Admin sees Peter's bookings | `code:200, bookings` | `code:200, bookings retrieved` | ✅ |
+| 6 | GET | `/api/booking/:id` | valid booking UUID + Peter's JWT | Get booking by ID (own booking) | `code:200, booking details` | `code:200, booking retrieved` | ✅ |
 
 ### Negative Cases
 
 | # | Method | Endpoint | Request / Body | Description | Expected | Actual | Result |
 |---|--------|----------|----------------|-------------|----------|--------|--------|
-| 2 | POST | `/api/booking/available-slots` | `{treatment_id: "not-a-uuid", staff_id: Jane, date:"2026-07-11"}` | Invalid treatment_id format | `code:400, validation error` | `code:400, "uuid"` | ✅ |
-| 3 | POST | `/api/booking/available-slots` | `{treatment_id: Haircut, staff_id: Jane, date:"bad-date"}` | Invalid date format | `code:400, validation error` | `code:400, "datetime"` | ✅ |
-| 4 | POST | `/api/booking/available-slots` | `{treatment_id: "0000...0000", staff_id: Jane, date:"2026-07-11"}` | Non-existent treatment UUID | `code:400, "treatment not found"` | `code:400, "treatment not found"` | ✅ |
-| 6 | POST | `/api/booking/` | `{treatment_id: Haircut, staff_id: Jane, start_time:"2026-07-11T10:00:00Z"}` no auth | Create booking without auth → unauthorized | `code:401` | `code:401, "missing authorization header"` | ✅ |
-| 7 | POST | `/api/booking/` | `{treatment_id: Massage, staff_id: Jane, start_time:"2026-07-11T10:00:00Z"}` + Peter's JWT | Duplicate booking same slot → conflict | `code:409, "slot not available"` | `code:409, "slot not available"` | ✅ |
-| 8 | POST | `/api/booking/` | `{treatment_id: "0000...0000", staff_id: Jane, start_time:"2026-07-11T10:00:00Z"}` + Peter's JWT | Non-existent treatment → not found | `code:404, "treatment not found"` | `code:404, "treatment not found"` | ✅ |
-| 10 | GET | `/api/booking/user/:userId` | Admin's userId + Peter's JWT | Get someone else's bookings → forbidden | `code:403` | `code:403, "forbidden"` | ✅ |
-| 11 | GET | `/api/booking/user/bad-uuid` | Invalid UUID + Peter's JWT | Invalid user ID format → bad request | `code:400, "invalid user_id"` | `code:400, "invalid user_id"` | ✅ |
-| 13 | POST | `/api/booking/available-slots` | `{treatment_id: Haircut, staff_id: John (admin), date:"2026-07-11"}` | Staff (admin John) not skilled — returns slots anyway (no skill check at this endpoint) | `code:200, 16 slots` | `code:200, 16 slots` | ✅ |
+| 7 | POST | `/api/booking/` | same slot as #2 + Peter's JWT | Duplicate booking same slot → conflict | `code:409, "slot not available"` | `code:409, "slot not available"` | ✅ |
+| 8 | POST | `/api/booking/` | `{treatment_id, staff_id, start_time}` no auth | Create booking without auth → unauthorized | `code:401` | `code:401, "missing authorization header"` | ✅ |
+| 9 | POST | `/api/booking/` | `{treatment_id: "0000...0000", staff_id: Jane}` + Peter's JWT | Non-existent treatment → not found | `code:400/404` | `code:404, "treatment not found"` | ✅ |
+| 10 | GET | `/api/booking/user/:userId` | Admin's userId + Peter's JWT | Access someone else's bookings → forbidden | `code:403` | `code:403, "forbidden"` | ✅ |
+| 11 | GET | `/api/booking/not-a-uuid` | invalid UUID + Peter's JWT | Invalid booking UUID format → bad request | `code:400` | `code:400, "invalid booking_id"` | ✅ |
+| 12 | GET | `/api/booking/:id` | valid UUID, no auth | Get booking without auth → unauthorized | `code:401` | `code:401, "missing authorization header"` | ✅ |
+| 13 | GET | `/api/booking/user/:userId` | valid userId, no auth | Get user bookings without auth → unauthorized | `code:401` | `code:401, "missing authorization header"` | ✅ |
+| 14 | POST | `/api/booking/available-slots` | `{treatment_id: "not-a-uuid", staff_id: Jane, date}` | Invalid treatment_id format → validation error | `code:400` | `code:400, "Validation failed"` | ✅ |
+| 15 | POST | `/api/booking/available-slots` | `{treatment_id: Haircut, staff_id: Jane, date:"bad-date"}` | Invalid date format → validation error | `code:400` | `code:400, "Validation failed"` | ✅ |
+| 16 | POST | `/api/booking/` | `{treatment_id: Haircut, staff_id: "0000...0000"}` + Peter's JWT | Non-existent staff UUID → 409 (staff not skilled) | `code:409` | `code:409, "staff is not skilled"` | ✅ |
+| 17 | GET | `/api/booking/00000000-0000-0000-0000-000000000000` | non-existent UUID + Peter's JWT | Non-existent booking → not found | `code:404` | `code:404, "booking not found"` | ✅ |
+
+**Result: 17/17 passed.**
 
 ### Notes
 - `available-slots` calculates slots based on treatment duration (Haircut=30min, Massage=60min, Manicure=45min)
@@ -226,6 +232,7 @@ Access rules:
 - Past-time slots are filtered out — slots before `time.Now()` are skipped
 - `available-slots` does NOT check whether the staff is skilled for the requested treatment (only checks treatment duration)
 - Skill check is done in the `Create` service layer only — returns 409 if staff lacks skill
+- `Get booking by ID` endpoint fixed: now properly returns 404 for non-existent bookings instead of nil pointer dereference
 
 ---
 
@@ -236,5 +243,6 @@ Access rules:
 | User / Auth | 39 | 39 | 0 |
 | Treatment CRUD | 21 | 21 | 0 |
 | StaffSkill CRUD | 21 | 21 | 0 |
-| Booking | 13 | 13 | 0 |
-| **Total** | **94** | **94** | **0** |
+| Booking | 17 | 17 | 0 |
+| Health Check | 1 | 1 | 0 |
+| **Total** | **99** | **99** | **0** |

@@ -222,7 +222,7 @@ func (c *Auth) LoginVerify(ctx *gin.Context) {
 }
 
 func (c *Auth) Logout(ctx *gin.Context) {
-	token := ctx.GetString("token")
+	token := ctx.GetString("tokenString")
 
 	err := c.authService.Logout(ctx.Request.Context(), token)
 	if err != nil {

@@ -225,19 +225,22 @@ func (c *Booking) CreateBooking(ctx *gin.Context) {
 
 // GetByUserID godoc
 // @Summary Get bookings by user ID
-// @Description Returns all bookings for a given user (must match authenticated user)
+// @Description Returns all bookings for a given user (must match authenticated user or be admin)
 // @Tags Booking
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
 // @Param userId path string true "User ID"
+// @Param status query string false "Filter by status (pending/confirmed/completed/cancelled)"
+// @Param treatment_name query string false "Filter by treatment name (partial match)"
 // @Success 200 {object} dto.SuccessResponse
 // @Failure 400 {object} dto.BadRequestResponse
 // @Failure 403 {object} dto.ForbiddenResponse
 // @Failure 500 {object} dto.InternalErrorResponse
 // @Router /api/booking/user/{userId} [get]
 func (c *Booking) GetByUserID(ctx *gin.Context) {
-	userID, err := uuid.Parse(ctx.Param("userId"))
+	userIDParam, err := uuid.Parse(ctx.Param("userId"))
+
 	if err != nil {
 		ctx.AbortWithStatusJSON(400, dto.BadRequestResponse{
 			Code:    400,
@@ -246,8 +249,19 @@ func (c *Booking) GetByUserID(ctx *gin.Context) {
 		return
 	}
 
-	userIDStr := ctx.GetString("userId")
-	if userIDStr != userID.String() {
+	var params dto.FilterBookingRequest
+
+	if err := ctx.ShouldBindQuery(&params); err != nil {
+		ctx.AbortWithStatusJSON(400, dto.BadRequestResponse{
+			Code:    400,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	role := ctx.GetString("role")
+	userID := ctx.GetString("userId")
+	if role != string(domain.RoleAdmin) && userID != userIDParam.String() {
 		ctx.AbortWithStatusJSON(403, dto.ForbiddenResponse{
 			Code:    403,
 			Message: "forbidden",
@@ -255,7 +269,10 @@ func (c *Booking) GetByUserID(ctx *gin.Context) {
 		return
 	}
 
-	bookings, err := c.bookingService.GetByUserID(userID)
+	bookings, err := c.bookingService.GetByUserID(userIDParam, domain.BookingQuery{
+		Status:        params.Status,
+		TreatmentName: params.TreatmentName,
+	})
 	if err != nil {
 		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
 			Code:    500,
@@ -268,5 +285,62 @@ func (c *Booking) GetByUserID(ctx *gin.Context) {
 		Code:    200,
 		Message: "bookings retrieved",
 		Data:    bookings,
+	})
+}
+
+// GetBookingByID godoc
+// @Summary Get booking by ID
+// @Description Returns a booking by its ID
+// @Tags Booking
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Booking ID"
+// @Success 200 {object} dto.SuccessResponse
+// @Failure 400 {object} dto.BadRequestResponse
+// @Failure 403 {object} dto.ForbiddenResponse
+// @Failure 500 {object} dto.InternalErrorResponse
+// @Router /api/booking/{id} [get]
+func (c *Booking) GetBookingByID(ctx *gin.Context) {
+	bookingID, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.AbortWithStatusJSON(400, dto.BadRequestResponse{
+			Code:    400,
+			Message: "invalid booking_id",
+		})
+		return
+	}
+
+	booking, err := c.bookingService.GetByID(bookingID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			ctx.AbortWithStatusJSON(404, dto.NotFoundResponse{
+				Code:    404,
+				Message: "booking not found",
+			})
+			return
+		}
+		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
+			Code:    500,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	role := ctx.GetString("role")
+	userId := ctx.GetString("userId")
+
+	if role != string(domain.RoleAdmin) && booking.ClientID.String() != userId {
+		ctx.AbortWithStatusJSON(403, dto.ForbiddenResponse{
+			Code:    403,
+			Message: "forbidden",
+		})
+		return
+	}
+
+	ctx.JSON(200, dto.SuccessResponse{
+		Code:    200,
+		Message: "booking retrieved",
+		Data:    booking,
 	})
 }

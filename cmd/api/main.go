@@ -65,6 +65,7 @@ func main() {
 	router.TreatmentRoutes(server, cont)
 	router.StaffSkillRoutes(server, cont)
 	router.BookingRoutes(server, cont)
+	router.HealthRoutes(server)
 
 	// Add Swagger UI
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

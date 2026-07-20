@@ -50,6 +50,6 @@ func BookingRoutes(router *gin.Engine, cont *container.Container) {
 	group := router.Group("/api/booking")
 	group.POST("/available-slots", cont.BookingController.GetAvailableSlots)
 	group.POST("/", middleware.AuthMiddleware(cont.AuthService), cont.BookingController.CreateBooking)
-	group.GET("/:id", middleware.AuthMiddleware(cont.AuthService))
+	group.GET("/:id", middleware.AuthMiddleware(cont.AuthService), cont.BookingController.GetBookingByID)
 	group.GET("/user/:userId", middleware.AuthMiddleware(cont.AuthService), cont.BookingController.GetByUserID)
 }

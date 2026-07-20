@@ -379,6 +379,41 @@ paths:
       summary: Create a new booking
       tags:
       - Booking
+  /api/booking/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Returns a booking by its ID
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.BadRequestResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ForbiddenResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.InternalErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get booking by ID
+      tags:
+      - Booking
   /api/booking/available-slots:
     post:
       consumes:
@@ -415,12 +450,20 @@ paths:
       consumes:
       - application/json
       description: Returns all bookings for a given user (must match authenticated
-        user)
+        user or be admin)
       parameters:
       - description: User ID
         in: path
         name: userId
         required: true
+        type: string
+      - description: Filter by status (pending/confirmed/completed/cancelled)
+        in: query
+        name: status
+        type: string
+      - description: Filter by treatment name (partial match)
+        in: query
+        name: treatment_name
         type: string
       produces:
       - application/json

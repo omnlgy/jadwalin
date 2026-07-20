@@ -60,3 +60,8 @@ type CreateBookingRequest struct {
 	StaffID     string `json:"staff_id" binding:"required,uuid"`
 	StartTime   string `json:"start_time" binding:"required,datetime=2006-01-02T15:04:05Z07:00"`
 }
+
+type FilterBookingRequest struct {
+	Status        string `json:"status" form:"status" binding:"omitempty,oneof=pending confirmed completed cancelled"`
+	TreatmentName string `json:"treatment_name" form:"treatment_name" binding:"omitempty"`
+}

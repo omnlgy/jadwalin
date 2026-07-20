@@ -24,10 +24,15 @@ type AvailableSlot struct {
 	EndTime   time.Time
 }
 
+type BookingQuery struct {
+	Status        string
+	TreatmentName string
+}
+
 type BookingRepository interface {
 	Create(booking *Booking) (*Booking, error)
 	GetByID(id uuid.UUID) (*Booking, error)
-	GetByUserID(userID uuid.UUID) ([]Booking, error)
+	GetByUserID(userID uuid.UUID, params BookingQuery) ([]Booking, error)
 	GetByTreatmentID(treatmentID uuid.UUID) ([]Booking, error)
 	GetByStaffID(staffID uuid.UUID) ([]Booking, error)
 	GetByDate(date time.Time) ([]Booking, error)
@@ -40,7 +45,7 @@ type BookingRepository interface {
 type BookingService interface {
 	Create(booking *Booking) (*Booking, error)
 	GetByID(id uuid.UUID) (*Booking, error)
-	GetByUserID(userID uuid.UUID) ([]Booking, error)
+	GetByUserID(userID uuid.UUID, params BookingQuery) ([]Booking, error)
 	GetByTreatmentID(treatmentID uuid.UUID) ([]Booking, error)
 	GetByStaffID(staffID uuid.UUID) ([]Booking, error)
 	GetByDate(date time.Time) ([]Booking, error)

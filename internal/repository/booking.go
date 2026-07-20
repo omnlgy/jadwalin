@@ -59,15 +59,22 @@ func (r *Booking) GetByID(id uuid.UUID) (*domain.Booking, error) {
 	return toDomainBooking(&m), nil
 }
 
-func (r *Booking) GetByUserID(userID uuid.UUID) ([]domain.Booking, error) {
-	var ms []models.Booking
-	err := r.db.Where("client_id = ?", userID).
-		Preload("Client").Preload("Staff").Preload("Treatment").
-		Order("start_time DESC").Find(&ms).Error
+func (r *Booking) GetByUserID(userID uuid.UUID, bookingQuery domain.BookingQuery) ([]domain.Booking, error) {
+	query := r.db.Model(&models.Booking{})
+	if bookingQuery.Status != "" {
+		query = query.Where("status = ?", bookingQuery.Status)
+	}
+
+	if bookingQuery.TreatmentName != "" {
+		query = query.Joins("JOIN treatments ON treatments.id = bookings.treatment_id").Where("treatments.name ILIKE ?", "%"+bookingQuery.TreatmentName+"%")
+	}
+
+	var bookings []models.Booking
+	err := query.Preload("Client").Preload("Staff").Preload("Treatment").Order("created_at DESC").Find(&bookings).Error
 	if err != nil {
 		return nil, fmt.Errorf("repo: get bookings by user %s: %w", userID, err)
 	}
-	return sliceToDomainBooking(ms), nil
+	return sliceToDomainBooking(bookings), nil
 }
 
 func (r *Booking) GetByTreatmentID(treatmentID uuid.UUID) ([]domain.Booking, error) {

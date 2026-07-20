@@ -309,9 +309,9 @@ func (c *StaffSkill) ListAll(ctx *gin.Context) {
 
 func toStaffSkillDTO(s *domain.StaffSkill) dto.StaffSkill {
 	d := dto.StaffSkill{
-		Id:              s.ID.String(),
-		UserID:          s.UserID.String(),
-		TreatmentID:     s.TreatmentID.String(),
+		Id:          s.ID.String(),
+		UserID:      s.UserID.String(),
+		TreatmentID: s.TreatmentID.String(),
 	}
 	if s.User != nil {
 		d.UserFullName = s.User.FullName
@@ -320,6 +320,7 @@ func toStaffSkillDTO(s *domain.StaffSkill) dto.StaffSkill {
 	if s.Treatment != nil {
 		d.TreatmentName = s.Treatment.Name
 		d.TreatmentPrice = s.Treatment.Price
+		d.TreatmentDuration = s.Treatment.Duration
 	}
 	return d
 }
