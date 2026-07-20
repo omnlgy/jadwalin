@@ -3,15 +3,16 @@ package controller
 import (
 	"errors"
 	"math"
-	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/minio/minio-go/v7"
 	"github.com/omnlgy/jadwalin/internal/domain"
 	"github.com/omnlgy/jadwalin/internal/dto"
+	"github.com/omnlgy/jadwalin/internal/storage"
 )
 
 type User struct {
@@ -348,7 +349,7 @@ func (c *User) UploadPhoto(ctx *gin.Context) {
 		return
 	}
 
-	file, err := ctx.FormFile("file")
+	file, header, err := ctx.Request.FormFile("file")
 	if err != nil {
 		ctx.AbortWithStatusJSON(400, dto.BadRequestResponse{
 			Code:    400,
@@ -357,28 +358,32 @@ func (c *User) UploadPhoto(ctx *gin.Context) {
 		return
 	}
 
-	// Create the uploads directory if it doesn't exist
-	uploadDir := "./public/uploads/photos"
-	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
-		os.MkdirAll(uploadDir, os.ModePerm)
-	}
+	bucketName := "jadwalin"
+	objectName := "uploads/photos/" + uuid.New().String() + filepath.Ext(header.Filename)
 
-	// Generate a unique filename
-	ext := filepath.Ext(file.Filename)
-	newFileName := strings.Replace(uuid.New().String(), "-", "", -1) + ext
-	destination := filepath.Join(uploadDir, newFileName)
+	_, err = storage.MinioClient.PutObject(ctx.Request.Context(), bucketName, objectName, file, header.Size, minio.PutObjectOptions{
+		ContentType: header.Header.Get("Content-Type"),
+	})
 
-	// Save the file
-	if err := ctx.SaveUploadedFile(file, destination); err != nil {
+	if err != nil {
 		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
 			Code:    500,
-			Message: "failed to save file",
+			Message: "failed to upload file",
+		})
+		return
+	}
+
+	url, err := storage.MinioClient.PresignedGetObject(ctx.Request.Context(), bucketName, objectName, time.Hour, nil)
+	if err != nil {
+		ctx.AbortWithStatusJSON(500, dto.InternalErrorResponse{
+			Code:    500,
+			Message: "failed to generate presigned URL",
 		})
 		return
 	}
 
 	// Update user's photo path in the database
-	if err := c.userService.UploadPhoto(userID, "/uploads/photos/" + newFileName); err != nil {
+	if err := c.userService.UploadPhoto(userID, objectName); err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			ctx.AbortWithStatusJSON(404, dto.BadRequestResponse{
 				Code:    404,
@@ -396,6 +401,6 @@ func (c *User) UploadPhoto(ctx *gin.Context) {
 	ctx.JSON(200, dto.SuccessResponse{
 		Code:    200,
 		Message: "photo uploaded successfully",
-		Data: gin.H{"photo_url": "/uploads/photos/" + newFileName},
+		Data:    gin.H{"photo_url": url.String()},
 	})
 }

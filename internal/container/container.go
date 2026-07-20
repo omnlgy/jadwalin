@@ -1,8 +1,10 @@
 package container
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/minio/minio-go/v7"
 	"github.com/omnlgy/jadwalin/internal/config"
 	"github.com/omnlgy/jadwalin/internal/controller"
 	"github.com/omnlgy/jadwalin/internal/db"
@@ -11,6 +13,7 @@ import (
 	"github.com/omnlgy/jadwalin/internal/provider"
 	"github.com/omnlgy/jadwalin/internal/repository"
 	"github.com/omnlgy/jadwalin/internal/service"
+	"github.com/omnlgy/jadwalin/internal/storage"
 )
 
 // Container holds all application dependencies
@@ -21,10 +24,11 @@ type Container struct {
 	StaffSkillController *controller.StaffSkill
 	BookingController    *controller.Booking
 	AuthService          domain.AuthService
+	MinioClient          *minio.Client
 }
 
 // InitializeContainer creates and initializes all application components
-func InitializeContainer(cfg *config.Config) (*Container, error) {
+func InitializeContainer(ctx context.Context, cfg *config.Config) (*Container, error) {
 	posgreDb, err := db.NewPostgresDB(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
@@ -63,6 +67,11 @@ func InitializeContainer(cfg *config.Config) (*Container, error) {
 	staffSkillController := controller.NewStaffSkillController(staffSkillService)
 	bookingController := controller.NewBookingController(bookingService, treatmentService, notificationService)
 
+	minioClient, err := storage.InitMinioClient(ctx, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize minio client: %w", err)
+	}
+
 	return &Container{
 		AuthController:       authController,
 		UserController:       userController,
@@ -70,6 +79,7 @@ func InitializeContainer(cfg *config.Config) (*Container, error) {
 		StaffSkillController: staffSkillController,
 		BookingController:    bookingController,
 		AuthService:          authService,
+		MinioClient:          minioClient,
 	}, nil
 }
 

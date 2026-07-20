@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -40,10 +41,11 @@ func init() {
 
 func main() {
 	fmt.Println("Initializing server...")
+	ctx := context.Background()
 
 	cfg := config.Load()
 
-	cont, err := container.InitializeContainer(cfg)
+	cont, err := container.InitializeContainer(ctx, cfg)
 	if err != nil {
 		fmt.Printf("Failed to initialize container: %v\n", err)
 		return

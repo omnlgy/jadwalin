@@ -7,27 +7,39 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/omnlgy/jadwalin/internal/db"
+	"github.com/omnlgy/jadwalin/internal/storage"
 )
 
 func HealthRoutes(router *gin.Engine) {
 	router.GET("/api/health", func(ctx *gin.Context) {
 		dbStatus := "connected"
 		redisStatus := "connected"
-		httpStatus := http.StatusOK
+		storageStatus := "connected"
+		status := true
 
 		// Check PostgreSQL
 		sqlDB, err := db.DB.DB()
 		if err != nil {
 			dbStatus = "unavailable"
-			httpStatus = http.StatusServiceUnavailable
+			status = false
 		} else if err := sqlDB.Ping(); err != nil {
 			dbStatus = "disconnected"
-			httpStatus = http.StatusServiceUnavailable
+			status = false
 		}
 
 		// Check Redis
 		if _, err := db.Redis.Ping(context.Background()).Result(); err != nil {
 			redisStatus = "disconnected"
+			status = false
+		}
+
+		if _, err := storage.MinioClient.ListBuckets(ctx); err != nil {
+			storageStatus = "disconnected"
+			status = false
+		}
+
+		httpStatus := http.StatusOK
+		if !status {
 			httpStatus = http.StatusServiceUnavailable
 		}
 
@@ -35,6 +47,7 @@ func HealthRoutes(router *gin.Engine) {
 			"status":   "ok",
 			"database": dbStatus,
 			"redis":    redisStatus,
+			"storage":  storageStatus,
 		})
 	})
 }
